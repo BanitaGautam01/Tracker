@@ -143,7 +143,8 @@
   }
 
   function renderDashboard() {
-    const all = statsFor(tasks.filter(t => (t.phase || 1) === 1));   // headline progress = Phase 1 (current execution)
+    const all = statsFor(tasks.filter(t => (t.phase || 1) === 1));   // headline = Phase 1 (current execution)
+    const overdue = tasks.filter(isOverdue).length;
     const risks = tasks.filter(t => t.status === 'atrisk' || t.status === 'blocked')
       .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
     const today = todayISO();
@@ -151,64 +152,39 @@
     const milestones = tasks.filter(t => t.milestone && t.date && t.date >= today && t.date <= horizon)
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    /* ---- management summary ---- */
-    $('#mgmtSummary').innerHTML = `
-      <div class="card summary">
-        <div class="sum-top">
-          <div class="sum-prog">
-            <div class="sum-pct">${all.pct}<span>%</span></div>
-            <div class="sum-prog-meta">
-              <div class="sum-lbl">Overall progress — Phase 1 (current execution)</div>
-              <div class="track lg"><div class="fill" style="width:${all.pct}%"></div></div>
-              <div class="sum-sub">${all.done} of ${all.total} tasks complete · weighted by status</div>
-            </div>
-          </div>
-          <div class="sum-counts">
-            ${[['Completed', all.done, 'done'], ['In Progress', all.inprogress, 'prog'],
-               ['At Risk', all.atrisk, 'risk'], ['Blocked', all.blocked, 'block']]
-              .map(([l, n, c]) => `<div class="mini ${c}"><b>${n}</b><span>${l}</span></div>`).join('')}
-          </div>
-        </div>
-        <div class="golive-targets">
-          ${EPICS.filter(e => e.goLiveDate).map(e => {
-            const r = epicStats(e.key), d = daysUntil(e.goLiveDate);
-            return `<div class="glt">
-              <div class="glt-name">🎯 ${esc(e.name)}</div>
-              <div class="glt-date">${fmtDate(e.goLiveDate)}</div>
-              <div class="glt-when ${d < 0 ? 'od' : ''}">${whenLabel(e.goLiveDate)} · ${r.pct}% ready</div>
-              ${e.goLiveNote ? `<div class="glt-note">${esc(e.goLiveNote)}</div>` : ''}
-            </div>`;
-          }).join('')}
-        </div>
-        <div class="sum-cols">
-          <div class="sum-col">
-            <h4 class="sc-risk">Critical blockers & risks — leadership attention</h4>
-            ${risks.length ? '<ul class="sum-list">' + risks.map(t =>
-              `<li><span class="dotc ${t.status === 'blocked' ? 'b' : 'r'}"></span>
-                 <b>${esc(t.title)}</b> — ${esc(t.risk || '')}
-                 <span class="muted">(${esc(t.owner || '—')} · by ${t.resolution ? fmtDate(t.resolution) : 'TBC'})</span></li>`).join('') + '</ul>'
-              : '<p class="muted">No active blockers or at-risk items. 🎉</p>'}
-          </div>
-          <div class="sum-col">
-            <h4 class="sc-mile">Upcoming milestones — next 2 weeks</h4>
-            ${milestones.length ? '<ul class="sum-list">' + milestones.map(t =>
-              `<li><span class="mile-date">${fmtDate(t.date)}</span> ${esc(t.title)}</li>`).join('') + '</ul>'
-              : '<p class="muted">No milestones in the next 14 days.</p>'}
-          </div>
-        </div>
-      </div>`;
+    // readiness status
+    const riskCount = all.blocked + all.atrisk + overdue;
+    let stCls = 'ok', stLabel = 'On track';
+    if (riskCount >= 3) { stCls = 'bad'; stLabel = 'At risk'; }
+    else if (riskCount > 0) { stCls = 'watch'; stLabel = 'Watch'; }
 
-    /* ---- risk & blocker register ---- */
-    $('#riskRegister').innerHTML = risks.length ? `
-      <h3 class="section-h">Risks &amp; Blockers Register</h3>
-      <div class="card riskcard"><div class="scroll"><table class="risktable">
-        <thead><tr><th>Item</th><th>Risk / Blocker</th><th>Impact</th><th>Owner</th><th>Expected Resolution</th><th>Mitigation / Next Action</th><th>Status</th></tr></thead>
-        <tbody>${risks.map(t => `<tr>
-          <td><b>${esc(t.title)}</b></td><td>${esc(t.risk || '—')}</td><td>${esc(t.impact || '—')}</td>
-          <td class="nowrap">${esc(t.owner || '—')}</td><td class="nowrap">${t.resolution ? fmtDate(t.resolution) : 'TBC'}</td>
-          <td>${esc(t.mitigation || '—')}</td>
-          <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
-        </tbody></table></div></div>` : '';
+    /* ---- readiness hero ---- */
+    $('#hero').innerHTML = `<div class="hero">
+      <div class="hero-main">
+        <div class="hero-lbl">Overall progress · Phase 1</div>
+        <div class="hero-pct">${all.pct}<span>%</span></div>
+        <div class="track lg"><div class="fill" style="width:${all.pct}%"></div></div>
+        <div class="hero-sub">${all.done} of ${all.total} tasks complete &nbsp;·&nbsp;
+          <span class="hero-status ${stCls}">● ${stLabel}</span></div>
+      </div>
+      <div class="hero-goals">
+        ${EPICS.filter(e => e.goLiveDate).map(e => {
+          const r = epicStats(e.key);
+          return `<div class="hero-goal">
+            <div class="hg-top"><span class="hg-name">${esc(e.name)}</span><span class="hg-pct">${r.pct}%</span></div>
+            <div class="track sm"><div class="fill" style="width:${r.pct}%"></div></div>
+            <div class="hg-date">🎯 ${fmtDate(e.goLiveDate)} · ${whenLabel(e.goLiveDate)}</div>
+            ${e.goLiveNote ? `<div class="hg-note">${esc(e.goLiveNote)}</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+    /* ---- stat strip ---- */
+    $('#statStrip').innerHTML = [
+      ['', all.total, 'Total'], ['done', all.done, 'Done'], ['prog', all.inprogress, 'In Progress'],
+      ['risk', all.atrisk, 'At Risk'], ['block', all.blocked, 'Blocked']
+    ].map(([c, n, l]) => `<div class="stat2 ${c} ${n === 0 ? 'z' : ''}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
 
     /* ---- task status by epic (simplified list) ---- */
     const epicRow = e => {
@@ -232,6 +208,24 @@
     // Phase 2 — lightweight roadmap list (all planned)
     $('#epicGrid2').innerHTML = `<div class="card p2list">${EPICS.filter(e => e.phase === 2).map(e =>
       `<div class="p2item"><span class="p2name">${esc(e.name)}</span><span class="p2band">${esc(e.band || '')}</span></div>`).join('')}</div>`;
+
+    /* ---- upcoming milestones ---- */
+    $('#milestonesCard').innerHTML = `<div class="card"><h3>Upcoming milestones · next 2 weeks</h3>
+      ${milestones.length ? '<ul class="clean-list">' + milestones.map(t =>
+        `<li><span class="mile-date">${fmtDate(t.date)}</span> ${esc(t.title)}</li>`).join('') + '</ul>'
+        : '<p class="muted">No milestones in the next 14 days.</p>'}</div>`;
+
+    /* ---- risks & blockers register ---- */
+    $('#risksCard').innerHTML = `<div class="card"><h3>Risks &amp; blockers ${risks.length ? `<span class="hcount">${risks.length}</span>` : ''}</h3>
+      ${risks.length ? `<div class="scroll"><table class="risktable">
+        <thead><tr><th>Item</th><th>Risk / Blocker</th><th>Impact</th><th>Owner</th><th>Resolution</th><th>Mitigation / Next Action</th><th>Status</th></tr></thead>
+        <tbody>${risks.map(t => `<tr>
+          <td><b>${esc(t.title)}</b></td><td>${esc(t.risk || '—')}</td><td>${esc(t.impact || '—')}</td>
+          <td class="nowrap">${esc(t.owner || '—')}</td><td class="nowrap">${t.resolution ? fmtDate(t.resolution) : 'TBC'}</td>
+          <td>${esc(t.mitigation || '—')}</td>
+          <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
+        </tbody></table></div>`
+        : '<p class="muted">No active blockers or at-risk items. 🎉</p>'}</div>`;
   }
 
   /* ---------- tasks list ---------- */
