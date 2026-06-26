@@ -5,9 +5,12 @@
   const STATUSES = {
     todo:       { label: 'Not Started', color: 'var(--todo)'  },
     inprogress: { label: 'In Progress', color: 'var(--prog)'  },
+    atrisk:     { label: 'At Risk',     color: 'var(--risk)'  },
     done:       { label: 'Done',        color: 'var(--done)'  },
     blocked:    { label: 'Blocked',     color: 'var(--block)' }
   };
+  const EPICS = window.INOPS_EPICS || [];
+  const epicName = k => (EPICS.find(e => e.key === k) || {}).name || k || '—';
   const SPRINT_START = '2026-06-24';
   const SPRINT_END   = '2026-07-06';
 
@@ -48,7 +51,8 @@
   function mondayOf(iso) { const dt = isoToDate(iso); const k = (dt.getDay() + 6) % 7; dt.setDate(dt.getDate() - k); return dateToISO(dt); }
   function addDays(iso, n) { const dt = isoToDate(iso); dt.setDate(dt.getDate() + n); return dateToISO(dt); }
   const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const STATUS_ORDER = { blocked: 0, inprogress: 1, todo: 2, done: 3 };
+  const STATUS_ORDER = { blocked: 0, atrisk: 1, inprogress: 2, todo: 3, done: 4 };
+  const isOverdue = t => t.status !== 'done' && t.date && t.date < todayISO();
   let weekStart = null;
   const curWeek = () => weekStart || (weekStart = mondayOf(todayISO()));
 
@@ -95,99 +99,145 @@
   }
 
   /* ---------- dashboard ---------- */
+  function statsFor(list) {
+    const c = { total: list.length, done: 0, inprogress: 0, atrisk: 0, blocked: 0, todo: 0 };
+    list.forEach(t => { c[t.status] = (c[t.status] || 0) + 1; });
+    c.pct = c.total ? Math.round(100 * (c.done + 0.5 * c.inprogress) / c.total) : 0;
+    return c;
+  }
+  function epicStats(key) {
+    const ep = EPICS.find(e => e.key === key) || { baseline: 0 };
+    const s = statsFor(tasks.filter(t => t.epic === key));
+    if (s.total === 0) s.pct = ep.baseline;     // fall back to baseline when no tasks tagged yet
+    s.baseline = ep.baseline;
+    return s;
+  }
+
   function renderDashboard() {
-    const total = tasks.length;
-    const by = { todo: 0, inprogress: 0, done: 0, blocked: 0 };
-    tasks.forEach(t => by[t.status] = (by[t.status] || 0) + 1);
-    const pct = total ? Math.round((by.done / total) * 100) : 0;
+    const all = statsFor(tasks);
+    const risks = tasks.filter(t => t.status === 'atrisk' || t.status === 'blocked')
+      .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+    const today = todayISO();
+    const horizon = addDays(today, 14);
+    const milestones = tasks.filter(t => t.milestone && t.date && t.date >= today && t.date <= horizon)
+      .sort((a, b) => a.date.localeCompare(b.date));
 
-    $('#statGrid').innerHTML = [
-      ['s-total', total, 'Total Tasks'],
-      ['s-done', by.done, 'Done'],
-      ['s-prog', by.inprogress, 'In Progress'],
-      ['s-todo', by.todo, 'Not Started'],
-      ['s-block', by.blocked, 'Blocked']
-    ].map(([c, n, l]) => `<div class="stat ${c}"><div class="num">${n}</div><div class="lbl">${l}</div></div>`).join('');
+    /* ---- management summary ---- */
+    $('#mgmtSummary').innerHTML = `
+      <div class="card summary">
+        <div class="sum-top">
+          <div class="sum-prog">
+            <div class="sum-pct">${all.pct}<span>%</span></div>
+            <div class="sum-prog-meta">
+              <div class="sum-lbl">Overall project progress</div>
+              <div class="track lg"><div class="fill" style="width:${all.pct}%"></div></div>
+              <div class="sum-sub">${all.done} of ${all.total} tasks complete · weighted by status</div>
+            </div>
+          </div>
+          <div class="sum-counts">
+            ${[['Completed', all.done, 'done'], ['In Progress', all.inprogress, 'prog'],
+               ['At Risk', all.atrisk, 'risk'], ['Blocked', all.blocked, 'block']]
+              .map(([l, n, c]) => `<div class="mini ${c}"><b>${n}</b><span>${l}</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="sum-cols">
+          <div class="sum-col">
+            <h4 class="sc-risk">Critical blockers & risks — leadership attention</h4>
+            ${risks.length ? '<ul class="sum-list">' + risks.map(t =>
+              `<li><span class="dotc ${t.status === 'blocked' ? 'b' : 'r'}"></span>
+                 <b>${esc(t.title)}</b> — ${esc(t.risk || '')}
+                 <span class="muted">(${esc(t.owner || '—')} · by ${t.resolution ? fmtDate(t.resolution) : 'TBC'})</span></li>`).join('') + '</ul>'
+              : '<p class="muted">No active blockers or at-risk items. 🎉</p>'}
+          </div>
+          <div class="sum-col">
+            <h4 class="sc-mile">Upcoming milestones — next 2 weeks</h4>
+            ${milestones.length ? '<ul class="sum-list">' + milestones.map(t =>
+              `<li><span class="mile-date">${fmtDate(t.date)}</span> ${esc(t.title)}</li>`).join('') + '</ul>'
+              : '<p class="muted">No milestones in the next 14 days.</p>'}
+          </div>
+        </div>
+      </div>`;
 
-    // donut
-    const seg = [
-      ['done', by.done, 'var(--done)'],
-      ['inprogress', by.inprogress, 'var(--prog)'],
-      ['blocked', by.blocked, 'var(--block)'],
-      ['todo', by.todo, 'var(--todo)']
-    ];
-    let acc = 0, stops = [];
-    seg.forEach(([, n, col]) => {
-      if (!total) return;
-      const a = (acc / total) * 360, b = ((acc + n) / total) * 360;
-      stops.push(`${col} ${a}deg ${b}deg`); acc += n;
-    });
-    $('#donut').style.background = total
-      ? `conic-gradient(${stops.join(',')})`
-      : 'var(--bg)';
-    $('#donut').style.webkitMask = 'radial-gradient(circle 52px at center, transparent 98%, #000 100%)';
-    $('#donut').style.mask = 'radial-gradient(circle 52px at center, transparent 98%, #000 100%)';
-    $('#donutPct').textContent = pct + '%';
-    $('#donutLegend').innerHTML = seg.map(([k, n, col]) =>
-      `<div class="li"><span class="dot" style="background:${col}"></span>${STATUSES[k].label} <b style="margin-left:auto">${n}</b></div>`
-    ).join('');
+    /* ---- risk & blocker register ---- */
+    $('#riskRegister').innerHTML = risks.length ? `
+      <h3 class="section-h">Risks &amp; Blockers Register</h3>
+      <div class="card riskcard"><div class="scroll"><table class="risktable">
+        <thead><tr><th>Item</th><th>Risk / Blocker</th><th>Impact</th><th>Owner</th><th>Expected Resolution</th><th>Mitigation / Next Action</th><th>Status</th></tr></thead>
+        <tbody>${risks.map(t => `<tr>
+          <td><b>${esc(t.title)}</b></td><td>${esc(t.risk || '—')}</td><td>${esc(t.impact || '—')}</td>
+          <td class="nowrap">${esc(t.owner || '—')}</td><td class="nowrap">${t.resolution ? fmtDate(t.resolution) : 'TBC'}</td>
+          <td>${esc(t.mitigation || '—')}</td>
+          <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
+        </tbody></table></div></div>` : '';
 
-    renderBars('#wsBars', groupBy('workstream'));
-    renderBars('#ownerBars', groupBy('owner'));
-  }
-  function groupBy(field) {
-    const m = {};
-    tasks.forEach(t => {
-      const k = t[field] || '—';
-      m[k] = m[k] || { total: 0, done: 0 };
-      m[k].total++; if (t.status === 'done') m[k].done++;
-    });
-    return m;
-  }
-  function renderBars(sel, map) {
-    const rows = Object.entries(map).sort((a, b) => b[1].total - a[1].total);
-    $(sel).innerHTML = rows.map(([k, v]) => {
-      const p = v.total ? Math.round((v.done / v.total) * 100) : 0;
-      return `<div class="bar-row"><div class="bl"><span>${esc(k)}</span><b>${v.done}/${v.total}</b></div>
-        <div class="track"><div class="fill" style="width:${p}%"></div></div></div>`;
-    }).join('') || '<p class="muted">No data</p>';
+    /* ---- task status by epic ---- */
+    $('#epicGrid').innerHTML = EPICS.map(e => {
+      const s = epicStats(e.key);
+      const cells = [['Total', s.total, ''], ['Done', s.done, 'done'], ['In Prog', s.inprogress, 'prog'],
+                     ['At Risk', s.atrisk, 'risk'], ['Blocked', s.blocked, 'block']];
+      return `<div class="epic">
+        <div class="epic-h"><span class="epic-name">${esc(e.name)}</span><span class="epic-pct">${s.pct}%</span></div>
+        <div class="track"><div class="fill" style="width:${s.pct}%"></div></div>
+        <div class="epic-cells">
+          ${cells.map(([l, n, c]) => `<div class="ecell ${c} ${n === 0 ? 'z' : ''}"><b>${n}</b><span>${l}</span></div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
   }
 
   /* ---------- tasks list ---------- */
   function renderTasks() {
     populateFilters();
     const q = $('#search').value.toLowerCase();
-    const fw = $('#fWorkstream').value, fo = $('#fOwner').value, fs = $('#fStatus').value;
+    const fe = $('#fEpic').value, fo = $('#fOwner').value, fs = $('#fStatus').value;
     const list = tasks.filter(t =>
-      (!q || (t.title + ' ' + (t.notes || '')).toLowerCase().includes(q)) &&
-      (!fw || t.workstream === fw) && (!fo || t.owner === fo) && (!fs || t.status === fs)
-    ).sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
+      (!q || (t.title + ' ' + (t.notes || '') + ' ' + (t.risk || '')).toLowerCase().includes(q)) &&
+      (!fe || t.epic === fe) && (!fo || t.owner === fo) && (!fs || t.status === fs));
 
-    $('#taskList').innerHTML = list.map(taskCard).join('') ||
-      '<p class="muted" style="padding:20px;text-align:center">No tasks match.</p>';
+    const sortFn = (a, b) => (STATUS_ORDER[a.status] - STATUS_ORDER[b.status]) || ((a.date || '9999').localeCompare(b.date || '9999'));
+    let html = '';
+    EPICS.forEach(e => {
+      const items = list.filter(t => t.epic === e.key).sort(sortFn);
+      if (!items.length) return;
+      const s = statsFor(items);
+      html += `<div class="epic-group">
+        <div class="epic-group-h"><span>${esc(e.name)}</span><span class="muted">${s.done}/${s.total} done · ${s.pct}%</span></div>
+        <div class="task-list">${items.map(taskCard).join('')}</div></div>`;
+    });
+    const orphans = list.filter(t => !EPICS.some(e => e.key === t.epic)).sort(sortFn);
+    if (orphans.length) html += `<div class="epic-group"><div class="epic-group-h"><span>Unassigned</span></div>
+      <div class="task-list">${orphans.map(taskCard).join('')}</div></div>`;
+
+    $('#taskList').innerHTML = html || '<p class="muted" style="padding:20px;text-align:center">No tasks match.</p>';
   }
   function taskCard(t) {
-    return `<div class="task st-${t.status}" data-id="${t.id}">
+    const od = isOverdue(t);
+    const showRisk = (t.status === 'atrisk' || t.status === 'blocked') && t.risk;
+    return `<div class="task st-${t.status}${od ? ' overdue' : ''}" data-id="${t.id}">
       <button class="check" data-act="toggle" title="Mark done">${t.status === 'done' ? '✓' : ''}</button>
       <div class="body">
         <div class="title">${esc(t.title)}</div>
         <div class="meta">
-          <span class="tag ws">${esc(t.workstream || '—')}</span>
+          <span class="tag epic">${esc(epicName(t.epic))}</span>
           <span class="tag owner">${esc(t.owner || '—')}</span>
-          ${t.date ? `<span class="tag date">${fmtDate(t.date)}</span>` : ''}
+          ${t.date ? `<span class="tag date${od ? ' od' : ''}">${fmtDate(t.date)}${od ? ' · overdue' : ''}</span>` : ''}
+          ${t.milestone ? '<span class="tag mile">★ milestone</span>' : ''}
           <select class="status-sel" data-act="status">
             ${Object.keys(STATUSES).map(s => `<option value="${s}" ${s === t.status ? 'selected' : ''}>${STATUSES[s].label}</option>`).join('')}
           </select>
         </div>
+        ${showRisk ? `<div class="risk-note"><b>${t.status === 'blocked' ? '⛔ Blocker' : '⚠ Risk'}:</b> ${esc(t.risk)}${t.mitigation ? ` <span class="muted">→ ${esc(t.mitigation)}</span>` : ''}</div>` : ''}
         ${t.notes ? `<div class="notes">${esc(t.notes)}</div>` : ''}
       </div>
       <button class="edit" data-act="edit" title="Edit">✎</button>
     </div>`;
   }
   function populateFilters() {
-    const ws = [...new Set(tasks.map(t => t.workstream).filter(Boolean))].sort();
     const ow = [...new Set(tasks.map(t => t.owner).filter(Boolean))].sort();
-    fillSelect('#fWorkstream', ws); fillSelect('#fOwner', ow);
+    const fe = $('#fEpic'), cur = fe.value;
+    fe.innerHTML = '<option value="">All epics</option>' + EPICS.map(e => `<option value="${e.key}">${esc(e.name)}</option>`).join('');
+    fe.value = cur;
+    fillSelect('#fOwner', ow);
     $('#ownerOptions').innerHTML = ow.map(o => `<option value="${esc(o)}">`).join('');
   }
   function fillSelect(sel, vals) {
@@ -235,15 +285,25 @@
   }
 
   /* ---------- modal ---------- */
+  function toggleRiskFields() {
+    const s = $('#fStatusInput').value;
+    $('#riskFields').classList.toggle('hidden', !(s === 'atrisk' || s === 'blocked'));
+  }
   function openModal(task) {
+    $('#fEpicInput').innerHTML = EPICS.map(e => `<option value="${e.key}">${esc(e.name)}</option>`).join('');
     $('#modalTitle').textContent = task ? 'Edit Task' : 'New Task';
     $('#taskId').value = task ? task.id : '';
     $('#fTitle').value = task ? task.title : '';
-    $('#fDate').value = task ? task.date : '';
-    $('#fOwnerInput').value = task ? task.owner : '';
-    $('#fWsInput').value = task ? task.workstream : 'Form';
+    $('#fDate').value = task ? (task.date || '') : '';
+    $('#fOwnerInput').value = task ? (task.owner || '') : '';
+    $('#fEpicInput').value = task ? (task.epic || EPICS[0].key) : EPICS[0].key;
     $('#fStatusInput').value = task ? task.status : 'todo';
     $('#fNotes').value = task ? (task.notes || '') : '';
+    $('#fRisk').value = task ? (task.risk || '') : '';
+    $('#fImpact').value = task ? (task.impact || '') : '';
+    $('#fResolution').value = task ? (task.resolution || '') : '';
+    $('#fMitigation').value = task ? (task.mitigation || '') : '';
+    toggleRiskFields();
     $('#btnDelete').classList.toggle('hidden', !task);
     $('#modal').classList.remove('hidden');
     $('#fTitle').focus();
@@ -277,7 +337,8 @@
   });
 
   $('#search').addEventListener('input', renderTasks);
-  ['#fWorkstream', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
+  ['#fEpic', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
+  $('#fStatusInput').addEventListener('change', toggleRiskFields);
 
   $('#wkPrev').addEventListener('click', () => { weekStart = addDays(curWeek(), -7); renderWeek(); });
   $('#wkNext').addEventListener('click', () => { weekStart = addDays(curWeek(), 7); renderWeek(); });
@@ -294,9 +355,13 @@
       title: $('#fTitle').value.trim(),
       date: $('#fDate').value,
       owner: $('#fOwnerInput').value.trim(),
-      workstream: $('#fWsInput').value,
+      epic: $('#fEpicInput').value,
       status: $('#fStatusInput').value,
-      notes: $('#fNotes').value.trim()
+      notes: $('#fNotes').value.trim(),
+      risk: $('#fRisk').value.trim(),
+      impact: $('#fImpact').value.trim(),
+      resolution: $('#fResolution').value,
+      mitigation: $('#fMitigation').value.trim()
     };
     if (!data.title) return;
     if (id) { Object.assign(findTask(id), data); }

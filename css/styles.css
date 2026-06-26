@@ -11,7 +11,8 @@
   --muted:#6B7886;
   /* status */
   --todo:#9AA5B1;
-  --prog:#FF9900;
+  --prog:#2563EB;
+  --risk:#D9822B;
   --done:#1F8E3D;
   --block:#D13212;
   --shadow:0 1px 2px rgba(35,47,62,.06),0 6px 18px rgba(35,47,62,.08);
@@ -87,6 +88,77 @@ button{font-family:inherit;cursor:pointer}
 .bar-row .bl b{color:var(--muted);font-weight:600}
 .track{height:9px;background:var(--bg);border-radius:6px;overflow:hidden}
 .fill{height:100%;border-radius:6px;background:var(--orange)}
+
+/* ===== Dashboard: management summary ===== */
+.section-h{font-size:16px;font-weight:800;margin:22px 0 12px}
+.summary{padding:20px 22px}
+.sum-top{display:flex;gap:26px;flex-wrap:wrap;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.sum-prog{display:flex;align-items:center;gap:18px;flex:1;min-width:280px}
+.sum-pct{font-size:46px;font-weight:800;line-height:1;color:var(--ink)}
+.sum-pct span{font-size:20px;color:var(--muted)}
+.sum-prog-meta{flex:1}
+.sum-lbl{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:6px}
+.track{height:9px;background:var(--bg);border-radius:6px;overflow:hidden}
+.track.lg{height:13px}
+.fill{height:100%;border-radius:6px;background:var(--orange)}
+.sum-sub{font-size:12.5px;color:var(--muted);margin-top:6px}
+.sum-counts{display:flex;gap:10px;flex-wrap:wrap}
+.mini{background:#fff;border:1px solid var(--line);border-top:3px solid var(--line);border-radius:11px;padding:11px 16px;text-align:center;min-width:88px}
+.mini b{display:block;font-size:24px;font-weight:800;line-height:1}
+.mini span{font-size:11.5px;color:var(--muted);font-weight:600}
+.mini.done{border-top-color:var(--done)} .mini.done b{color:var(--done)}
+.mini.prog{border-top-color:var(--prog)} .mini.prog b{color:var(--prog)}
+.mini.risk{border-top-color:var(--risk)} .mini.risk b{color:var(--risk)}
+.mini.block{border-top-color:var(--block)} .mini.block b{color:var(--block)}
+.sum-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px}
+.sum-col h4{margin:0 0 10px;font-size:13px}
+.sum-col h4.sc-risk{color:var(--block)} .sum-col h4.sc-mile{color:var(--risk)}
+.sum-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.sum-list li{line-height:1.4}
+.dotc{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.dotc.b{background:var(--block)} .dotc.r{background:var(--risk)}
+.mile-date{display:inline-block;background:#FFF4E0;color:#9a5b00;font-weight:700;font-size:11.5px;padding:1px 8px;border-radius:6px;margin-right:6px}
+
+/* risk register table */
+.riskcard{padding:0;overflow:hidden}
+.risktable{width:100%;border-collapse:collapse;font-size:13px}
+.risktable th{background:var(--soft,#f1f5f9);text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#475569;font-weight:800;border-bottom:1px solid var(--line);white-space:nowrap}
+.risktable td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.risktable tr:last-child td{border-bottom:none}
+.st-chip{display:inline-block;border-radius:6px;padding:2px 9px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.st-chip.st-blocked{background:#FBE3E0;color:var(--block)}
+.st-chip.st-atrisk{background:#FBEFD9;color:#9a5b00}
+
+/* epic grid */
+.epic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.epic{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px;box-shadow:var(--shadow)}
+.epic-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.epic-name{font-weight:700;font-size:14px}
+.epic-pct{font-weight:800;font-size:16px}
+.epic-cells{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.ecell{text-align:center;border:1px solid var(--line);border-radius:8px;padding:7px 2px;background:#fcfdfe}
+.ecell b{display:block;font-size:17px;font-weight:800;line-height:1}
+.ecell span{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.ecell.done b{color:var(--done)} .ecell.prog b{color:var(--prog)}
+.ecell.risk b{color:var(--risk)} .ecell.block b{color:var(--block)}
+.ecell.z{opacity:.5}
+
+/* epic groups in Tasks tab */
+.epic-group{margin-bottom:18px}
+.epic-group-h{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;font-weight:800;color:var(--ink);padding:6px 2px;margin-bottom:8px;border-bottom:2px solid var(--line)}
+.risk-note{font-size:12.5px;background:#FFF7E8;border:1px solid #f3dcae;border-radius:8px;padding:6px 10px;margin-top:6px;color:#7a4b00}
+.tag.epic{background:#EEF2FF;color:#3730a3}
+.tag.mile{background:#FFF4E0;color:#9a5b00}
+.tag.date.od{background:#FBE3E0;color:var(--block);font-weight:700}
+.task.overdue{border-left-color:var(--block)}
+.task.st-atrisk{border-left-color:var(--risk)}
+
+/* modal risk fields */
+.risk-fields{border:1px solid #f3dcae;background:#FFFBF2;border-radius:11px;padding:12px 14px;margin-bottom:12px}
+.rf-head{font-size:12.5px;font-weight:800;color:#9a5b00;margin-bottom:8px}
+
+@media(max-width:760px){ .sum-cols{grid-template-columns:1fr} }
 
 /* ===== Tasks ===== */
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
@@ -170,7 +242,8 @@ button{font-family:inherit;cursor:pointer}
 .evt:hover{filter:brightness(.97)}
 .evt .et{font-weight:600;color:var(--ink)}
 .evt .eo{color:var(--muted);font-size:11px;margin-top:2px}
-.evt.st-inprogress{border-left-color:var(--prog);background:#FFF7E8}
+.evt.st-inprogress{border-left-color:var(--prog);background:#EFF5FF}
+.evt.st-atrisk{border-left-color:var(--risk);background:#FFF7E8}
 .evt.st-done{border-left-color:var(--done);background:#EAFAF1}
 .evt.st-done .et{text-decoration:line-through;color:var(--muted)}
 .evt.st-blocked{border-left-color:var(--block);background:#FDEEEC}

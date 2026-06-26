@@ -39,25 +39,10 @@
 
   <!-- ===== Dashboard ===== -->
   <section id="view-dashboard" class="view">
-    <div class="stat-grid" id="statGrid"></div>
-    <div class="dash-row">
-      <div class="card donut-card">
-        <h3>Overall progress</h3>
-        <div class="donut-wrap">
-          <div class="donut" id="donut"></div>
-          <div class="donut-center"><span id="donutPct">0%</span><small>complete</small></div>
-        </div>
-        <div class="legend" id="donutLegend"></div>
-      </div>
-      <div class="card">
-        <h3>By workstream</h3>
-        <div class="bars" id="wsBars"></div>
-      </div>
-      <div class="card">
-        <h3>By owner</h3>
-        <div class="bars" id="ownerBars"></div>
-      </div>
-    </div>
+    <div id="mgmtSummary"></div>
+    <div id="riskRegister"></div>
+    <h3 class="section-h">Task Status by Epic</h3>
+    <div class="epic-grid" id="epicGrid"></div>
   </section>
 
   <!-- ===== Today's Focus ===== -->
@@ -73,12 +58,13 @@
   <section id="view-tasks" class="view hidden">
     <div class="toolbar">
       <input type="search" id="search" placeholder="Search tasks…">
-      <select id="fWorkstream"><option value="">All workstreams</option></select>
+      <select id="fEpic"><option value="">All epics</option></select>
       <select id="fOwner"><option value="">All owners</option></select>
       <select id="fStatus">
         <option value="">All statuses</option>
         <option value="todo">Not Started</option>
         <option value="inprogress">In Progress</option>
+        <option value="atrisk">At Risk</option>
         <option value="done">Done</option>
         <option value="blocked">Blocked</option>
       </select>
@@ -128,22 +114,30 @@
         </label>
       </div>
       <div class="row2">
-        <label>Workstream
-          <select id="fWsInput">
-            <option>Form</option><option>mGrant</option><option>Training</option>
-            <option>Reports</option><option>App</option>
-          </select>
+        <label>Epic
+          <select id="fEpicInput"></select>
         </label>
         <label>Status
           <select id="fStatusInput">
             <option value="todo">Not Started</option>
             <option value="inprogress">In Progress</option>
+            <option value="atrisk">At Risk</option>
             <option value="done">Done</option>
             <option value="blocked">Blocked</option>
           </select>
         </label>
       </div>
       <label>Notes<textarea id="fNotes" rows="2"></textarea></label>
+      <div id="riskFields" class="risk-fields hidden">
+        <div class="rf-head">⚠ At Risk / Blocked — details for leadership</div>
+        <label>Risk / Blocker<textarea id="fRisk" rows="2"></textarea></label>
+        <label>Impact<textarea id="fImpact" rows="2"></textarea></label>
+        <div class="row2">
+          <label>Expected Resolution<input type="date" id="fResolution"></label>
+          <label>&nbsp;</label>
+        </div>
+        <label>Mitigation / Next Action<textarea id="fMitigation" rows="2"></textarea></label>
+      </div>
       <div class="modal-actions">
         <button type="button" id="btnDelete" class="btn btn-ghost danger hidden">Delete</button>
         <span class="spacer"></span>
