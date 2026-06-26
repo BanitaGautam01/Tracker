@@ -5,24 +5,24 @@
 
 window.INOPS_EPICS = [
   /* Go-Live roll-ups — progress collated from their member epics + own tasks */
-  { key:'mgrant-golive', name:'mGrant Go-Live', baseline:0, goLiveDate:'2026-07-01',
+  { key:'mgrant-golive', name:'mGrant Go-Live', project:'mGrant', baseline:0, goLiveDate:'2026-07-01',
     rollup:['mgrant-setup','mgrant-onboard','mgrant-train','data-upload','dash-reports','kpi'] },
-  { key:'mform-golive',  name:'mForm Go-Live',  baseline:0, goLiveDate:'2026-07-03', goLiveNote:'temporary — depends on Play Store listing the app',
+  { key:'mform-golive',  name:'mForm Go-Live',  project:'mForm', baseline:0, goLiveDate:'2026-07-03', goLiveNote:'temporary — depends on Play Store listing the app',
     rollup:['form-design','form-dev','app-dev','app-train','app-onboard','partner-fb'] },
-  /* mForm track */
-  { key:'form-design',    name:'Form Design Refinement',     baseline:100 },
-  { key:'partner-fb',     name:'Partner Feedback (2 cycles)', baseline:50 },
-  { key:'form-dev',       name:'Form Development',           baseline:60 },
-  { key:'app-dev',        name:'Application Development',     baseline:30 },
-  { key:'app-train',      name:'App Training',               baseline:0  },
-  { key:'app-onboard',    name:'App User Onboarding',        baseline:0  },
-  /* mGrant track */
-  { key:'mgrant-setup',   name:'mGrant Setup',               baseline:95 },
-  { key:'mgrant-onboard', name:'mGrant User Onboarding',     baseline:0  },
-  { key:'mgrant-train',   name:'mGrant Training',            baseline:0  },
-  { key:'data-upload',    name:'Data Upload',                baseline:0  },
-  { key:'dash-reports',   name:'Dashboard & Reports',        baseline:0  },
-  { key:'kpi',            name:'KPI Refinement',             baseline:0  }
+  /* mForm project (app + form + their training/onboarding) */
+  { key:'form-design',    name:'Form Design Refinement',     project:'mForm', baseline:100 },
+  { key:'partner-fb',     name:'Partner Feedback (2 cycles)', project:'mForm', baseline:50 },
+  { key:'form-dev',       name:'Form Development',           project:'mForm', baseline:60 },
+  { key:'app-dev',        name:'Application Development',     project:'mForm', baseline:30 },
+  { key:'app-train',      name:'App Training',               project:'mForm', baseline:0  },
+  { key:'app-onboard',    name:'App User Onboarding',        project:'mForm', baseline:0  },
+  /* mGrant project (everything else) */
+  { key:'mgrant-setup',   name:'mGrant Setup',               project:'mGrant', baseline:95 },
+  { key:'mgrant-onboard', name:'mGrant User Onboarding',     project:'mGrant', baseline:0  },
+  { key:'mgrant-train',   name:'mGrant Training',            project:'mGrant', baseline:0  },
+  { key:'data-upload',    name:'Data Upload',                project:'mGrant', baseline:0  },
+  { key:'dash-reports',   name:'Dashboard & Reports',        project:'mGrant', baseline:0  },
+  { key:'kpi',            name:'KPI Refinement',             project:'mGrant', baseline:0  }
 ];
 
 window.INOPS_SEED = [

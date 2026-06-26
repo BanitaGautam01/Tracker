@@ -11,10 +11,12 @@
   };
   const EPICS = window.INOPS_EPICS || [];
   const epicName = k => (EPICS.find(e => e.key === k) || {}).name || k || '—';
+  const epicProject = k => (EPICS.find(e => e.key === k) || {}).project || 'mGrant';
   const SPRINT_START = '2026-06-24';
   const SPRINT_END   = '2026-07-06';
 
   let tasks = load();
+  stampProjects();
 
   /* ---------- storage ---------- */
   function load() {
@@ -24,6 +26,8 @@
     } catch (e) { /* ignore */ }
     return clone(window.INOPS_SEED || []);
   }
+  // link every task to its project (mForm / mGrant) via its epic
+  function stampProjects() { tasks.forEach(t => { t.project = epicProject(t.epic); }); }
   function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function uid() { return 't' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); }
@@ -212,10 +216,10 @@
   function renderTasks() {
     populateFilters();
     const q = $('#search').value.toLowerCase();
-    const fe = $('#fEpic').value, fo = $('#fOwner').value, fs = $('#fStatus').value;
+    const fp = $('#fProject').value, fe = $('#fEpic').value, fo = $('#fOwner').value, fs = $('#fStatus').value;
     const list = tasks.filter(t =>
       (!q || (t.title + ' ' + (t.notes || '') + ' ' + (t.risk || '')).toLowerCase().includes(q)) &&
-      (!fe || t.epic === fe) && (!fo || t.owner === fo) && (!fs || t.status === fs));
+      (!fp || t.project === fp) && (!fe || t.epic === fe) && (!fo || t.owner === fo) && (!fs || t.status === fs));
 
     const sortFn = (a, b) => (STATUS_ORDER[a.status] - STATUS_ORDER[b.status]) || ((a.date || '9999').localeCompare(b.date || '9999'));
     let html = '';
@@ -241,6 +245,7 @@
       <div class="body">
         <div class="title">${esc(t.title)}</div>
         <div class="meta">
+          <span class="tag proj ${t.project === 'mForm' ? 'pf' : 'pg'}">${esc(t.project || epicProject(t.epic))}</span>
           <span class="tag epic">${esc(epicName(t.epic))}</span>
           <span class="tag owner">${esc(t.owner || '—')}</span>
           ${t.date ? `<span class="tag date${od ? ' od' : ''}">${fmtDate(t.date)}${od ? ' · overdue' : ''}</span>` : ''}
@@ -312,6 +317,10 @@
     const s = $('#fStatusInput').value;
     $('#riskFields').classList.toggle('hidden', !(s === 'atrisk' || s === 'blocked'));
   }
+  function updateProjHint() {
+    const p = epicProject($('#fEpicInput').value);
+    $('#projHint').innerHTML = `Project: <b class="${p === 'mForm' ? 'pf' : 'pg'}">${p}</b> <span class="muted">(auto-linked from epic)</span>`;
+  }
   function openModal(task) {
     $('#fEpicInput').innerHTML = EPICS.map(e => `<option value="${e.key}">${esc(e.name)}</option>`).join('');
     $('#modalTitle').textContent = task ? 'Edit Task' : 'New Task';
@@ -327,6 +336,7 @@
     $('#fResolution').value = task ? (task.resolution || '') : '';
     $('#fMitigation').value = task ? (task.mitigation || '') : '';
     toggleRiskFields();
+    updateProjHint();
     $('#btnDelete').classList.toggle('hidden', !task);
     $('#modal').classList.remove('hidden');
     $('#fTitle').focus();
@@ -360,8 +370,9 @@
   });
 
   $('#search').addEventListener('input', renderTasks);
-  ['#fEpic', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
+  ['#fProject', '#fEpic', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
   $('#fStatusInput').addEventListener('change', toggleRiskFields);
+  $('#fEpicInput').addEventListener('change', updateProjHint);
 
   $('#wkPrev').addEventListener('click', () => { weekStart = addDays(curWeek(), -7); renderWeek(); });
   $('#wkNext').addEventListener('click', () => { weekStart = addDays(curWeek(), 7); renderWeek(); });
@@ -380,6 +391,7 @@
       owner: $('#fOwnerInput').value.trim(),
       epic: $('#fEpicInput').value,
       status: $('#fStatusInput').value,
+      project: epicProject($('#fEpicInput').value),
       notes: $('#fNotes').value.trim(),
       risk: $('#fRisk').value.trim(),
       impact: $('#fImpact').value.trim(),
@@ -415,7 +427,7 @@
     r.onload = () => {
       try {
         const arr = JSON.parse(r.result);
-        if (Array.isArray(arr)) { tasks = arr; save(); refresh(); alert('Imported ' + arr.length + ' tasks.'); }
+        if (Array.isArray(arr)) { tasks = arr; stampProjects(); save(); refresh(); alert('Imported ' + arr.length + ' tasks.'); }
       } catch (err) { alert('Could not read that file.'); }
     };
     r.readAsText(f);
@@ -423,7 +435,7 @@
   });
   $('#btnReset').addEventListener('click', () => {
     if (confirm('Reset to the default iNOPs plan? Your changes will be lost.')) {
-      tasks = clone(window.INOPS_SEED || []); save(); refresh();
+      tasks = clone(window.INOPS_SEED || []); stampProjects(); save(); refresh();
       $('#menuList').classList.add('hidden');
     }
   });

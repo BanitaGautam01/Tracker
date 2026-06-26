@@ -58,6 +58,11 @@
   <section id="view-tasks" class="view hidden">
     <div class="toolbar">
       <input type="search" id="search" placeholder="Search tasks…">
+      <select id="fProject">
+        <option value="">All projects</option>
+        <option value="mForm">mForm</option>
+        <option value="mGrant">mGrant</option>
+      </select>
       <select id="fEpic"><option value="">All epics</option></select>
       <select id="fOwner"><option value="">All owners</option></select>
       <select id="fStatus">
@@ -116,6 +121,7 @@
       <div class="row2">
         <label>Epic
           <select id="fEpicInput"></select>
+          <span class="proj-hint" id="projHint"></span>
         </label>
         <label>Status
           <select id="fStatusInput">
