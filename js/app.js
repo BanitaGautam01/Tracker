@@ -210,26 +210,25 @@
           <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
         </tbody></table></div></div>` : '';
 
-    /* ---- task status by epic (Phase 1 + Phase 2) ---- */
-    const epicCard = e => {
+    /* ---- task status by epic (compact list) ---- */
+    const cell = (n, c) => `<td class="ecount ${c} ${n === 0 ? 'z' : ''}">${n}</td>`;
+    const epicRow = e => {
       const s = epicStats(e.key);
-      const cells = [['Total', s.total, ''], ['Done', s.done, 'done'], ['In Prog', s.inprogress, 'prog'],
-                     ['At Risk', s.atrisk, 'risk'], ['Blocked', s.blocked, 'block']];
-      const goLive = e.goLiveDate
-        ? `<div class="golive-line">🎯 Go-live: <b>${fmtDate(e.goLiveDate)}</b> · ${whenLabel(e.goLiveDate)}${e.goLiveNote ? ` <span class="muted">(${esc(e.goLiveNote)})</span>` : ''}</div>`
-        : '';
-      const band = e.band ? `<div class="band-line">🗓 ${esc(e.band)}</div>` : '';
-      return `<div class="epic${e.rollup ? ' golive' : ''}${e.phase === 2 ? ' p2' : ''}">
-        <div class="epic-h"><span class="epic-name">${esc(e.name)}${e.rollup ? ' <span class="rollup-badge">roll-up</span>' : ''}</span><span class="epic-pct">${s.pct}%</span></div>
-        ${goLive}${band}
-        <div class="track"><div class="fill" style="width:${s.pct}%"></div></div>
-        <div class="epic-cells">
-          ${cells.map(([l, n, c]) => `<div class="ecell ${c} ${n === 0 ? 'z' : ''}"><b>${n}</b><span>${l}</span></div>`).join('')}
-        </div>
-      </div>`;
+      const sub = e.goLiveDate
+        ? `<div class="erow-sub gl">🎯 Go-live ${fmtDate(e.goLiveDate)} · ${whenLabel(e.goLiveDate)}${e.goLiveNote ? ` — ${esc(e.goLiveNote)}` : ''}</div>`
+        : e.band ? `<div class="erow-sub band">🗓 ${esc(e.band)}</div>` : '';
+      return `<tr class="${e.rollup ? 'er-golive' : ''} ${e.phase === 2 ? 'er-p2' : ''}">
+        <td class="ename">${esc(e.name)}${e.rollup ? ' <span class="rollup-badge">roll-up</span>' : ''}${sub}</td>
+        <td class="eprog"><div class="track"><div class="fill" style="width:${s.pct}%"></div></div></td>
+        <td class="epct">${s.pct}%</td>
+        ${cell(s.total, '')}${cell(s.done, 'done')}${cell(s.inprogress, 'prog')}${cell(s.atrisk, 'risk')}${cell(s.blocked, 'block')}
+      </tr>`;
     };
-    $('#epicGrid').innerHTML = EPICS.filter(e => (e.phase || 1) === 1).map(epicCard).join('');
-    $('#epicGrid2').innerHTML = EPICS.filter(e => e.phase === 2).map(epicCard).join('');
+    const epicTable = list => `<div class="card etable-card"><div class="scroll"><table class="etable">
+      <thead><tr><th>Epic</th><th class="th-prog">Progress</th><th>%</th><th>Total</th><th>Done</th><th>In&nbsp;Prog</th><th>At&nbsp;Risk</th><th>Blocked</th></tr></thead>
+      <tbody>${list.map(epicRow).join('')}</tbody></table></div></div>`;
+    $('#epicGrid').innerHTML = epicTable(EPICS.filter(e => (e.phase || 1) === 1));
+    $('#epicGrid2').innerHTML = epicTable(EPICS.filter(e => e.phase === 2));
   }
 
   /* ---------- tasks list ---------- */
