@@ -12,7 +12,7 @@ window.INOPS_EPICS = [
     rollup:['form-design','form-dev','app-dev','app-train','app-onboard','partner-fb'] },
   /* mForm project (app + form + their training/onboarding) */
   { key:'form-design',    name:'Form Design Refinement',     project:'mForm', baseline:100 },
-  { key:'partner-fb',     name:'Partner Feedback (2 cycles)', project:'mForm', baseline:50 },
+  { key:'partner-fb',     name:'Partner Feedback – Round 1',  project:'mForm', baseline:100 },
   { key:'form-dev',       name:'Form Development',           project:'mForm', baseline:60 },
   { key:'app-dev',        name:'Application Development',     project:'mForm', baseline:30 },
   { key:'app-train',      name:'App Training',               project:'mForm', baseline:0  },
@@ -32,7 +32,8 @@ window.INOPS_EPICS = [
   { key:'csr-aap',   name:'CSR Plan & AAP (+ Landing Pages)',    project:'mGrant', phase:2, band:'M3 · Aug',       baseline:0 },
   { key:'approvals', name:'Approval Workflows',                  project:'mGrant', phase:2, band:'M4 · Aug–Sep',   baseline:0 },
   { key:'notifs',    name:'Notifications',                       project:'mGrant', phase:2, band:'M4 · Sep',       baseline:0 },
-  { key:'alignment', name:'Alignment & Stabilisation',          project:'mGrant', phase:2, band:'M4 · Sep–Oct',   baseline:0 }
+  { key:'alignment', name:'Alignment & Stabilisation',          project:'mGrant', phase:2, band:'M4 · Sep–Oct',   baseline:0 },
+  { key:'pfb-r2',    name:'Partner Feedback – Round 2 (enhancements)', project:'mForm', phase:2, band:'Next phase', baseline:0 }
 ];
 
 window.INOPS_SEED = [
@@ -42,14 +43,8 @@ window.INOPS_SEED = [
   { id:'r1c', title:'Round 1 — form change requests logged', date:'', owner:'Banita', epic:'partner-fb', status:'done', notes:'Cycle 1 complete' },
   { id:'r1d', title:'Round 1 — partner sign-off captured', date:'', owner:'Banita', epic:'partner-fb', status:'done', notes:'Cycle 1 complete' },
 
-  /* ---------- Partner Feedback — Cycle 2 (this sprint) ---------- */
-  { id:'t1',  title:'Share finalised execution plan & tracker with Amazon',                 date:'2026-06-24', owner:'Banita',           epic:'partner-fb', status:'inprogress', notes:'Round 2 kickoff' },
-  { id:'t2',  title:'Send theme-wise form-walkthrough invites to all 12 NGO partners',      date:'2026-06-24', owner:'Banita',           epic:'partner-fb', status:'inprogress', notes:'Round 2' },
-  { id:'t4',  title:'Round 2 walkthrough & feedback — ICEP: SAAD, Way for Life, Read India', date:'2026-06-25', owner:'Banita',          epic:'partner-fb', status:'todo', notes:'' },
-  { id:'t5',  title:'Round 2 walkthrough & feedback — HHH, Jan Sahas',                       date:'2026-06-26', owner:'Banita',          epic:'partner-fb', status:'todo', notes:'' },
-  { id:'t6',  title:'Round 2 walkthrough & feedback — Pinkishe, SHE and We',                 date:'2026-06-26', owner:'Banita',          epic:'partner-fb', status:'todo', notes:'' },
-  { id:'t7',  title:'Round 2 walkthrough & feedback — Food Security: SNEHA, Hunger',         date:'2026-06-29', owner:'Banita',          epic:'partner-fb', status:'todo', notes:'' },
-  { id:'t9',  title:'Round 2 — consolidate all partner feedback into master log',           date:'2026-06-29', owner:'Banita',           epic:'partner-fb', status:'todo', notes:'Closes Cycle 2 -> 100%' },
+  /* Cycle 2 (Round 2) partner-feedback tasks removed — deferred to next phase per mail thread.
+     Tracked as the Phase 2 epic 'Partner Feedback – Round 2 (enhancements)'. */
 
   /* ---------- Form Design Refinement ---------- */
   { id:'fd1', title:'Finalise ICEP form design',                date:'', owner:'Fathima + Banita', epic:'form-design', status:'done', notes:'' },

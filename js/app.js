@@ -1,7 +1,7 @@
 /* Amazon iNOPs Task Tracker — vanilla JS, localStorage persistence */
 (function () {
   'use strict';
-  const KEY = 'inops_tasks_v3';   // bump = ignore old cached data, load current plan
+  const KEY = 'inops_tasks_v4';   // bump = ignore old cached data, load current plan
   const STATUSES = {
     todo:       { label: 'Not Started', color: 'var(--todo)'  },
     inprogress: { label: 'In Progress', color: 'var(--prog)'  },
@@ -214,18 +214,6 @@
       ${milestones.length ? '<ul class="clean-list">' + milestones.map(t =>
         `<li><span class="mile-date">${fmtDate(t.date)}</span> ${esc(t.title)}</li>`).join('') + '</ul>'
         : '<p class="muted">No milestones in the next 14 days.</p>'}</div>`;
-
-    /* ---- risks & blockers register ---- */
-    $('#risksCard').innerHTML = `<div class="card"><h3>Risks &amp; blockers ${risks.length ? `<span class="hcount">${risks.length}</span>` : ''}</h3>
-      ${risks.length ? `<div class="scroll"><table class="risktable">
-        <thead><tr><th>Item</th><th>Risk / Blocker</th><th>Impact</th><th>Owner</th><th>Resolution</th><th>Mitigation / Next Action</th><th>Status</th></tr></thead>
-        <tbody>${risks.map(t => `<tr>
-          <td><b>${esc(t.title)}</b></td><td>${esc(t.risk || '—')}</td><td>${esc(t.impact || '—')}</td>
-          <td class="nowrap">${esc(t.owner || '—')}</td><td class="nowrap">${t.resolution ? fmtDate(t.resolution) : 'TBC'}</td>
-          <td>${esc(t.mitigation || '—')}</td>
-          <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
-        </tbody></table></div>`
-        : '<p class="muted">No active blockers or at-risk items. 🎉</p>'}</div>`;
   }
 
   /* ---------- tasks list ---------- */
