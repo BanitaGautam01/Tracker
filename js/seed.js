@@ -4,20 +4,25 @@
    from task status (see app.js); baseline is a reference starting point. */
 
 window.INOPS_EPICS = [
+  /* Go-Live roll-ups — progress collated from their member epics + own tasks */
+  { key:'mgrant-golive', name:'mGrant Go-Live', baseline:0, goLiveDate:'2026-07-01',
+    rollup:['mgrant-setup','mgrant-onboard','mgrant-train','data-upload','dash-reports','kpi'] },
+  { key:'mform-golive',  name:'mForm Go-Live',  baseline:0, goLiveDate:'2026-07-03', goLiveNote:'temporary — depends on Play Store listing the app',
+    rollup:['form-design','form-dev','app-dev','app-train','app-onboard','partner-fb'] },
+  /* mForm track */
   { key:'form-design',    name:'Form Design Refinement',     baseline:100 },
   { key:'partner-fb',     name:'Partner Feedback (2 cycles)', baseline:50 },
   { key:'form-dev',       name:'Form Development',           baseline:60 },
   { key:'app-dev',        name:'Application Development',     baseline:30 },
-  { key:'mgrant-setup',   name:'mGrant Setup',               baseline:95 },
-  { key:'kpi',            name:'KPI Refinement',             baseline:0  },
-  { key:'data-upload',    name:'Data Upload',                baseline:0  },
-  { key:'mgrant-onboard', name:'mGrant User Onboarding',     baseline:0  },
-  { key:'app-onboard',    name:'App User Onboarding',        baseline:0  },
-  { key:'mgrant-train',   name:'mGrant Training',            baseline:0  },
   { key:'app-train',      name:'App Training',               baseline:0  },
+  { key:'app-onboard',    name:'App User Onboarding',        baseline:0  },
+  /* mGrant track */
+  { key:'mgrant-setup',   name:'mGrant Setup',               baseline:95 },
+  { key:'mgrant-onboard', name:'mGrant User Onboarding',     baseline:0  },
+  { key:'mgrant-train',   name:'mGrant Training',            baseline:0  },
+  { key:'data-upload',    name:'Data Upload',                baseline:0  },
   { key:'dash-reports',   name:'Dashboard & Reports',        baseline:0  },
-  { key:'mform-golive',   name:'mForm Go-Live',              baseline:0  },
-  { key:'mgrant-golive',  name:'mGrant Go-Live',             baseline:0  }
+  { key:'kpi',            name:'KPI Refinement',             baseline:0  }
 ];
 
 window.INOPS_SEED = [
@@ -105,6 +110,6 @@ window.INOPS_SEED = [
 
   /* ---------- Go-Live ---------- */
   { id:'t18', title:'DEMO mGrant to Amazon — incl Weekly & Monthly reports', date:'2026-07-06', owner:'Banita + Akshat', epic:'mgrant-golive', status:'todo', milestone:true, notes:'🏁 ANCHOR — mGrant Demo Ready' },
-  { id:'gl1', title:'mGrant production go-live', date:'2026-07-29', owner:'Banita + Akshat', epic:'mgrant-golive', status:'todo', notes:'Target 29 Jul' },
-  { id:'gl2', title:'mForm production go-live',  date:'2026-07-29', owner:'Banita + Fathima', epic:'mform-golive', status:'todo', notes:'Target early Aug possible' }
+  { id:'gl1', title:'mGrant production go-live', date:'2026-07-01', owner:'Banita + Akshat', epic:'mgrant-golive', status:'todo', milestone:true, notes:'Target go-live 1 Jul' },
+  { id:'gl2', title:'mForm production go-live',  date:'2026-07-03', owner:'Banita + Fathima', epic:'mform-golive', status:'todo', milestone:true, notes:'Temporary 3 Jul — depends on Play Store listing the app' }
 ];

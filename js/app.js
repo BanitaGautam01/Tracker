@@ -107,10 +107,18 @@
   }
   function epicStats(key) {
     const ep = EPICS.find(e => e.key === key) || { baseline: 0 };
-    const s = statsFor(tasks.filter(t => t.epic === key));
+    const pool = ep.rollup
+      ? tasks.filter(t => t.epic === key || ep.rollup.includes(t.epic))   // roll-up: collate member epics + own tasks
+      : tasks.filter(t => t.epic === key);
+    const s = statsFor(pool);
     if (s.total === 0) s.pct = ep.baseline;     // fall back to baseline when no tasks tagged yet
     s.baseline = ep.baseline;
     return s;
+  }
+  function daysUntil(iso) { return Math.round((isoToDate(iso) - isoToDate(todayISO())) / 86400000); }
+  function whenLabel(iso) {
+    const d = daysUntil(iso);
+    return d > 0 ? `in ${d} day${d > 1 ? 's' : ''}` : d === 0 ? 'today' : `${-d} day${d < -1 ? 's' : ''} overdue`;
   }
 
   function renderDashboard() {
@@ -139,6 +147,17 @@
                ['At Risk', all.atrisk, 'risk'], ['Blocked', all.blocked, 'block']]
               .map(([l, n, c]) => `<div class="mini ${c}"><b>${n}</b><span>${l}</span></div>`).join('')}
           </div>
+        </div>
+        <div class="golive-targets">
+          ${EPICS.filter(e => e.goLiveDate).map(e => {
+            const r = epicStats(e.key), d = daysUntil(e.goLiveDate);
+            return `<div class="glt">
+              <div class="glt-name">🎯 ${esc(e.name)}</div>
+              <div class="glt-date">${fmtDate(e.goLiveDate)}</div>
+              <div class="glt-when ${d < 0 ? 'od' : ''}">${whenLabel(e.goLiveDate)} · ${r.pct}% ready</div>
+              ${e.goLiveNote ? `<div class="glt-note">${esc(e.goLiveNote)}</div>` : ''}
+            </div>`;
+          }).join('')}
         </div>
         <div class="sum-cols">
           <div class="sum-col">
@@ -175,8 +194,12 @@
       const s = epicStats(e.key);
       const cells = [['Total', s.total, ''], ['Done', s.done, 'done'], ['In Prog', s.inprogress, 'prog'],
                      ['At Risk', s.atrisk, 'risk'], ['Blocked', s.blocked, 'block']];
-      return `<div class="epic">
-        <div class="epic-h"><span class="epic-name">${esc(e.name)}</span><span class="epic-pct">${s.pct}%</span></div>
+      const goLive = e.goLiveDate
+        ? `<div class="golive-line">🎯 Go-live: <b>${fmtDate(e.goLiveDate)}</b> · ${whenLabel(e.goLiveDate)}${e.goLiveNote ? ` <span class="muted">(${esc(e.goLiveNote)})</span>` : ''}</div>`
+        : '';
+      return `<div class="epic${e.rollup ? ' golive' : ''}">
+        <div class="epic-h"><span class="epic-name">${esc(e.name)}${e.rollup ? ' <span class="rollup-badge">roll-up</span>' : ''}</span><span class="epic-pct">${s.pct}%</span></div>
+        ${goLive}
         <div class="track"><div class="fill" style="width:${s.pct}%"></div></div>
         <div class="epic-cells">
           ${cells.map(([l, n, c]) => `<div class="ecell ${c} ${n === 0 ? 'z' : ''}"><b>${n}</b><span>${l}</span></div>`).join('')}
