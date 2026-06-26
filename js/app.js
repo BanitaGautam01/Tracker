@@ -210,25 +210,28 @@
           <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
         </tbody></table></div></div>` : '';
 
-    /* ---- task status by epic (compact list) ---- */
-    const cell = (n, c) => `<td class="ecount ${c} ${n === 0 ? 'z' : ''}">${n}</td>`;
+    /* ---- task status by epic (simplified list) ---- */
     const epicRow = e => {
       const s = epicStats(e.key);
-      const sub = e.goLiveDate
-        ? `<div class="erow-sub gl">🎯 Go-live ${fmtDate(e.goLiveDate)} · ${whenLabel(e.goLiveDate)}${e.goLiveNote ? ` — ${esc(e.goLiveNote)}` : ''}</div>`
-        : e.band ? `<div class="erow-sub band">🗓 ${esc(e.band)}</div>` : '';
-      return `<tr class="${e.rollup ? 'er-golive' : ''} ${e.phase === 2 ? 'er-p2' : ''}">
+      const flags = (s.blocked || s.atrisk)
+        ? `${s.blocked ? `<span class="flag blk">⛔ ${s.blocked}</span>` : ''}${s.atrisk ? `<span class="flag rsk">⚠ ${s.atrisk}</span>` : ''}`
+        : '<span class="muted">—</span>';
+      const sub = e.goLiveDate ? `<div class="erow-sub gl">🎯 ${fmtDate(e.goLiveDate)} · ${whenLabel(e.goLiveDate)}</div>` : '';
+      return `<tr class="${e.rollup ? 'er-golive' : ''}">
         <td class="ename">${esc(e.name)}${e.rollup ? ' <span class="rollup-badge">roll-up</span>' : ''}${sub}</td>
         <td class="eprog"><div class="track"><div class="fill" style="width:${s.pct}%"></div></div></td>
         <td class="epct">${s.pct}%</td>
-        ${cell(s.total, '')}${cell(s.done, 'done')}${cell(s.inprogress, 'prog')}${cell(s.atrisk, 'risk')}${cell(s.blocked, 'block')}
+        <td class="etasks">${s.done}/${s.total}</td>
+        <td class="eflags">${flags}</td>
       </tr>`;
     };
-    const epicTable = list => `<div class="card etable-card"><div class="scroll"><table class="etable">
-      <thead><tr><th>Epic</th><th class="th-prog">Progress</th><th>%</th><th>Total</th><th>Done</th><th>In&nbsp;Prog</th><th>At&nbsp;Risk</th><th>Blocked</th></tr></thead>
-      <tbody>${list.map(epicRow).join('')}</tbody></table></div></div>`;
-    $('#epicGrid').innerHTML = epicTable(EPICS.filter(e => (e.phase || 1) === 1));
-    $('#epicGrid2').innerHTML = epicTable(EPICS.filter(e => e.phase === 2));
+    $('#epicGrid').innerHTML = `<div class="card etable-card"><div class="scroll"><table class="etable">
+      <thead><tr><th>Epic</th><th class="th-prog">Progress</th><th>%</th><th>Tasks</th><th>Flags</th></tr></thead>
+      <tbody>${EPICS.filter(e => (e.phase || 1) === 1).map(epicRow).join('')}</tbody></table></div></div>`;
+
+    // Phase 2 — lightweight roadmap list (all planned)
+    $('#epicGrid2').innerHTML = `<div class="card p2list">${EPICS.filter(e => e.phase === 2).map(e =>
+      `<div class="p2item"><span class="p2name">${esc(e.name)}</span><span class="p2band">${esc(e.band || '')}</span></div>`).join('')}</div>`;
   }
 
   /* ---------- tasks list ---------- */

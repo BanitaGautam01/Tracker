@@ -178,12 +178,20 @@ button{font-family:inherit;cursor:pointer}
 .etable .eprog{width:34%;min-width:120px}
 .etable .eprog .track{height:9px}
 .etable .epct{font-weight:800;text-align:right;white-space:nowrap;width:48px}
-.ecount{text-align:center;font-weight:700;width:58px}
-.ecount.done{color:var(--done)} .ecount.prog{color:var(--prog)} .ecount.risk{color:var(--risk)} .ecount.block{color:var(--block)}
-.ecount.z{color:#c2c8d0;font-weight:500}
+.etable .etasks{text-align:center;font-weight:700;width:70px;color:var(--muted)}
+.etable .eflags{text-align:center;width:96px;white-space:nowrap}
+.flag{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;margin:0 1px}
+.flag.blk{background:#FBE3E0;color:var(--block)} .flag.rsk{background:#FBEFD9;color:#9a5b00}
 .etable tr.er-golive{background:#FFFAF0}
-.etable tr.er-p2{background:#FBFCFE}
+.etable tr.er-golive .ename{font-size:14px}
 @media(max-width:680px){ .etable .eprog,.etable th.th-prog{display:none} .etable .ename{min-width:120px} }
+
+/* Phase 2 roadmap — lightweight list */
+.p2list{padding:6px 4px}
+.p2item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line)}
+.p2item:last-child{border-bottom:none}
+.p2name{font-weight:600;font-size:13.5px}
+.p2band{font-size:11.5px;font-weight:700;color:#64748b;background:#eef1f5;border-radius:7px;padding:3px 9px;white-space:nowrap}
 
 /* epic groups in Tasks tab */
 .epic-group{margin-bottom:18px}
