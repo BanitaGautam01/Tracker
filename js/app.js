@@ -1,7 +1,7 @@
 /* Amazon iNOPs Task Tracker — vanilla JS, localStorage persistence */
 (function () {
   'use strict';
-  const KEY = 'inops_tasks_v1';
+  const KEY = 'inops_tasks_v2';   // bump = ignore old pre-epic cached data, load current plan
   const STATUSES = {
     todo:       { label: 'Not Started', color: 'var(--todo)'  },
     inprogress: { label: 'In Progress', color: 'var(--prog)'  },
@@ -113,11 +113,26 @@
   }
   function epicStats(key) {
     const ep = EPICS.find(e => e.key === key) || { baseline: 0 };
-    const pool = ep.rollup
-      ? tasks.filter(t => t.epic === key || ep.rollup.includes(t.epic))   // roll-up: collate member epics + own tasks
-      : tasks.filter(t => t.epic === key);
-    const s = statsFor(pool);
-    if (s.total === 0) s.pct = ep.baseline;     // fall back to baseline when no tasks tagged yet
+    if (ep.rollup) {
+      const pool = tasks.filter(t => t.epic === key || ep.rollup.includes(t.epic));   // collate member epics + own
+      const s = statsFor(pool);
+      // if member epics carry effort weights, compute readiness as a weighted average of their progress
+      if (ep.rollup.some(m => (EPICS.find(e => e.key === m) || {}).weight)) {
+        let wsum = 0, acc = 0;
+        ep.rollup.forEach(m => {
+          const me = EPICS.find(e => e.key === m) || {}, w = me.weight || 0;
+          if (!w) return;
+          const ms = statsFor(tasks.filter(t => t.epic === m));
+          acc += w * (ms.total ? ms.pct : (me.baseline || 0)); wsum += w;
+        });
+        if (wsum) s.pct = Math.round(acc / wsum);
+      }
+      if (s.total === 0) s.pct = ep.baseline;
+      s.baseline = ep.baseline;
+      return s;
+    }
+    const s = statsFor(tasks.filter(t => t.epic === key));
+    if (s.total === 0) s.pct = ep.baseline;
     s.baseline = ep.baseline;
     return s;
   }

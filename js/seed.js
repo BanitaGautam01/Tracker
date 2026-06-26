@@ -6,6 +6,7 @@
 window.INOPS_EPICS = [
   /* Go-Live roll-ups — progress collated from their member epics + own tasks */
   { key:'mgrant-golive', name:'mGrant Go-Live', project:'mGrant', baseline:0, goLiveDate:'2026-07-01',
+    goLiveNote:'platform ~90% ready · data upload & validation in progress',
     rollup:['mgrant-setup','mgrant-onboard','mgrant-train','data-upload','dash-reports','kpi'] },
   { key:'mform-golive',  name:'mForm Go-Live',  project:'mForm', baseline:0, goLiveDate:'2026-07-03', goLiveNote:'temporary — depends on Play Store listing the app',
     rollup:['form-design','form-dev','app-dev','app-train','app-onboard','partner-fb'] },
@@ -17,12 +18,13 @@ window.INOPS_EPICS = [
   { key:'app-train',      name:'App Training',               project:'mForm', baseline:0  },
   { key:'app-onboard',    name:'App User Onboarding',        project:'mForm', baseline:0  },
   /* mGrant project (everything else) */
-  { key:'mgrant-setup',   name:'mGrant Setup',               project:'mGrant', baseline:95 },
-  { key:'mgrant-onboard', name:'mGrant User Onboarding',     project:'mGrant', baseline:0  },
-  { key:'mgrant-train',   name:'mGrant Training',            project:'mGrant', baseline:0  },
-  { key:'data-upload',    name:'Data Upload',                project:'mGrant', baseline:0  },
-  { key:'dash-reports',   name:'Dashboard & Reports',        project:'mGrant', baseline:0  },
-  { key:'kpi',            name:'KPI Refinement',             project:'mGrant', baseline:0  },
+  /* weight = relative effort toward mGrant go-live; platform Setup is the dominant chunk */
+  { key:'mgrant-setup',   name:'mGrant Setup',               project:'mGrant', baseline:95, weight:88 },
+  { key:'mgrant-onboard', name:'mGrant User Onboarding',     project:'mGrant', baseline:0,  weight:2  },
+  { key:'mgrant-train',   name:'mGrant Training',            project:'mGrant', baseline:0,  weight:2  },
+  { key:'data-upload',    name:'Data Upload',                project:'mGrant', baseline:0,  weight:5  },
+  { key:'dash-reports',   name:'Dashboard & Reports',        project:'mGrant', baseline:0,  weight:2  },
+  { key:'kpi',            name:'KPI Refinement',             project:'mGrant', baseline:0,  weight:1  },
 
   /* ===== Phase 2 — planned roadmap (post go-live), ref. M1–M4 milestone plan ===== */
   { key:'fin-disb',  name:'Financial, Disbursement & Invoicing', project:'mGrant', phase:2, band:'M2 · Jul',       baseline:0 },
@@ -80,7 +82,7 @@ window.INOPS_SEED = [
   { id:'ms2', title:'Grant types & lifecycle workflow config',      date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'' },
   { id:'ms3', title:'Roles, permissions & approval workflow',       date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'' },
   { id:'ms4', title:'Donor & financial year setup',                 date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'' },
-  { id:'ms5', title:'Final setup QA & UAT',                         date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'Setup complete — ~50% of mGrant effort' },
+  { id:'ms5', title:'Final setup QA & validation',                  date:'', owner:'Akshat', epic:'mgrant-setup', status:'inprogress', notes:'Platform built; final validation in progress (~90–95%)' },
 
   /* ---------- mGrant User Onboarding ---------- */
   { id:'t11', title:'mGrant — create NGO partner profiles (profiling)', date:'2026-06-30', owner:'Akshat', epic:'mgrant-onboard', status:'todo', notes:'' },
@@ -88,7 +90,7 @@ window.INOPS_SEED = [
   { id:'t17', title:'mGrant — onboard NGO users + rehearse demo', date:'2026-07-03', owner:'Akshat + Banita', epic:'mgrant-onboard', status:'todo', notes:'' },
 
   /* ---------- Data Upload ---------- */
-  { id:'t15', title:'mGrant — application set-up + GAF data upload + create users', date:'2026-07-02', owner:'Akshat', epic:'data-upload', status:'todo', notes:'' },
+  { id:'t15', title:'mGrant — application set-up + GAF data upload + create users', date:'2026-07-02', owner:'Akshat', epic:'data-upload', status:'inprogress', notes:'Data upload in progress' },
   { id:'t22', title:'Legacy data upload', date:'', owner:'Akshat', epic:'data-upload', status:'atrisk',
     risk:'Legacy data scope, source files & cut-off date not yet defined', impact:'Historical data may be missing at go-live; reporting continuity affected',
     resolution:'2026-07-10', mitigation:'Banita to define legacy scope & share source files; schedule upload after mGrant demo', notes:'Scope to be expanded' },
