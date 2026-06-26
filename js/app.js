@@ -12,6 +12,8 @@
   const EPICS = window.INOPS_EPICS || [];
   const epicName = k => (EPICS.find(e => e.key === k) || {}).name || k || '—';
   const epicProject = k => (EPICS.find(e => e.key === k) || {}).project || 'mGrant';
+  const epicPhase = k => (EPICS.find(e => e.key === k) || {}).phase || 1;
+  const epicBand = k => (EPICS.find(e => e.key === k) || {}).band || '';
   const SPRINT_START = '2026-06-24';
   const SPRINT_END   = '2026-07-06';
 
@@ -26,8 +28,8 @@
     } catch (e) { /* ignore */ }
     return clone(window.INOPS_SEED || []);
   }
-  // link every task to its project (mForm / mGrant) via its epic
-  function stampProjects() { tasks.forEach(t => { t.project = epicProject(t.epic); }); }
+  // link every task to its project (mForm / mGrant) and phase via its epic
+  function stampProjects() { tasks.forEach(t => { t.project = epicProject(t.epic); t.phase = epicPhase(t.epic); }); }
   function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function uid() { return 't' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); }
@@ -126,7 +128,7 @@
   }
 
   function renderDashboard() {
-    const all = statsFor(tasks);
+    const all = statsFor(tasks.filter(t => (t.phase || 1) === 1));   // headline progress = Phase 1 (current execution)
     const risks = tasks.filter(t => t.status === 'atrisk' || t.status === 'blocked')
       .sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
     const today = todayISO();
@@ -141,7 +143,7 @@
           <div class="sum-prog">
             <div class="sum-pct">${all.pct}<span>%</span></div>
             <div class="sum-prog-meta">
-              <div class="sum-lbl">Overall project progress</div>
+              <div class="sum-lbl">Overall progress — Phase 1 (current execution)</div>
               <div class="track lg"><div class="fill" style="width:${all.pct}%"></div></div>
               <div class="sum-sub">${all.done} of ${all.total} tasks complete · weighted by status</div>
             </div>
@@ -193,33 +195,37 @@
           <td><span class="st-chip st-${t.status}">${STATUSES[t.status].label}</span></td></tr>`).join('')}
         </tbody></table></div></div>` : '';
 
-    /* ---- task status by epic ---- */
-    $('#epicGrid').innerHTML = EPICS.map(e => {
+    /* ---- task status by epic (Phase 1 + Phase 2) ---- */
+    const epicCard = e => {
       const s = epicStats(e.key);
       const cells = [['Total', s.total, ''], ['Done', s.done, 'done'], ['In Prog', s.inprogress, 'prog'],
                      ['At Risk', s.atrisk, 'risk'], ['Blocked', s.blocked, 'block']];
       const goLive = e.goLiveDate
         ? `<div class="golive-line">🎯 Go-live: <b>${fmtDate(e.goLiveDate)}</b> · ${whenLabel(e.goLiveDate)}${e.goLiveNote ? ` <span class="muted">(${esc(e.goLiveNote)})</span>` : ''}</div>`
         : '';
-      return `<div class="epic${e.rollup ? ' golive' : ''}">
+      const band = e.band ? `<div class="band-line">🗓 ${esc(e.band)}</div>` : '';
+      return `<div class="epic${e.rollup ? ' golive' : ''}${e.phase === 2 ? ' p2' : ''}">
         <div class="epic-h"><span class="epic-name">${esc(e.name)}${e.rollup ? ' <span class="rollup-badge">roll-up</span>' : ''}</span><span class="epic-pct">${s.pct}%</span></div>
-        ${goLive}
+        ${goLive}${band}
         <div class="track"><div class="fill" style="width:${s.pct}%"></div></div>
         <div class="epic-cells">
           ${cells.map(([l, n, c]) => `<div class="ecell ${c} ${n === 0 ? 'z' : ''}"><b>${n}</b><span>${l}</span></div>`).join('')}
         </div>
       </div>`;
-    }).join('');
+    };
+    $('#epicGrid').innerHTML = EPICS.filter(e => (e.phase || 1) === 1).map(epicCard).join('');
+    $('#epicGrid2').innerHTML = EPICS.filter(e => e.phase === 2).map(epicCard).join('');
   }
 
   /* ---------- tasks list ---------- */
   function renderTasks() {
     populateFilters();
     const q = $('#search').value.toLowerCase();
-    const fp = $('#fProject').value, fe = $('#fEpic').value, fo = $('#fOwner').value, fs = $('#fStatus').value;
+    const fp = $('#fProject').value, fph = $('#fPhase').value, fe = $('#fEpic').value, fo = $('#fOwner').value, fs = $('#fStatus').value;
     const list = tasks.filter(t =>
       (!q || (t.title + ' ' + (t.notes || '') + ' ' + (t.risk || '')).toLowerCase().includes(q)) &&
-      (!fp || t.project === fp) && (!fe || t.epic === fe) && (!fo || t.owner === fo) && (!fs || t.status === fs));
+      (!fp || t.project === fp) && (!fph || String(t.phase || 1) === fph) &&
+      (!fe || t.epic === fe) && (!fo || t.owner === fo) && (!fs || t.status === fs));
 
     const sortFn = (a, b) => (STATUS_ORDER[a.status] - STATUS_ORDER[b.status]) || ((a.date || '9999').localeCompare(b.date || '9999'));
     let html = '';
@@ -370,7 +376,7 @@
   });
 
   $('#search').addEventListener('input', renderTasks);
-  ['#fProject', '#fEpic', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
+  ['#fProject', '#fPhase', '#fEpic', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
   $('#fStatusInput').addEventListener('change', toggleRiskFields);
   $('#fEpicInput').addEventListener('change', updateProjHint);
 

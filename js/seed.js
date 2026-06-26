@@ -22,7 +22,15 @@ window.INOPS_EPICS = [
   { key:'mgrant-train',   name:'mGrant Training',            project:'mGrant', baseline:0  },
   { key:'data-upload',    name:'Data Upload',                project:'mGrant', baseline:0  },
   { key:'dash-reports',   name:'Dashboard & Reports',        project:'mGrant', baseline:0  },
-  { key:'kpi',            name:'KPI Refinement',             project:'mGrant', baseline:0  }
+  { key:'kpi',            name:'KPI Refinement',             project:'mGrant', baseline:0  },
+
+  /* ===== Phase 2 — planned roadmap (post go-live), ref. M1–M4 milestone plan ===== */
+  { key:'fin-disb',  name:'Financial, Disbursement & Invoicing', project:'mGrant', phase:2, band:'M2 · Jul',       baseline:0 },
+  { key:'analytics', name:'Analytics & Workflow Pilot',          project:'mGrant', phase:2, band:'M2 · Jul',       baseline:0 },
+  { key:'csr-aap',   name:'CSR Plan & AAP (+ Landing Pages)',    project:'mGrant', phase:2, band:'M3 · Aug',       baseline:0 },
+  { key:'approvals', name:'Approval Workflows',                  project:'mGrant', phase:2, band:'M4 · Aug–Sep',   baseline:0 },
+  { key:'notifs',    name:'Notifications',                       project:'mGrant', phase:2, band:'M4 · Sep',       baseline:0 },
+  { key:'alignment', name:'Alignment & Stabilisation',          project:'mGrant', phase:2, band:'M4 · Sep–Oct',   baseline:0 }
 ];
 
 window.INOPS_SEED = [
@@ -72,7 +80,7 @@ window.INOPS_SEED = [
   { id:'ms2', title:'Grant types & lifecycle workflow config',      date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'' },
   { id:'ms3', title:'Roles, permissions & approval workflow',       date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'' },
   { id:'ms4', title:'Donor & financial year setup',                 date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'' },
-  { id:'ms5', title:'Final setup QA & UAT',                         date:'', owner:'Akshat', epic:'mgrant-setup', status:'inprogress', notes:'' },
+  { id:'ms5', title:'Final setup QA & UAT',                         date:'', owner:'Akshat', epic:'mgrant-setup', status:'done', notes:'Setup complete — ~50% of mGrant effort' },
 
   /* ---------- mGrant User Onboarding ---------- */
   { id:'t11', title:'mGrant — create NGO partner profiles (profiling)', date:'2026-06-30', owner:'Akshat', epic:'mgrant-onboard', status:'todo', notes:'' },
@@ -111,5 +119,21 @@ window.INOPS_SEED = [
   /* ---------- Go-Live ---------- */
   { id:'t18', title:'DEMO mGrant to Amazon — incl Weekly & Monthly reports', date:'2026-07-06', owner:'Banita + Akshat', epic:'mgrant-golive', status:'todo', milestone:true, notes:'🏁 ANCHOR — mGrant Demo Ready' },
   { id:'gl1', title:'mGrant production go-live', date:'2026-07-01', owner:'Banita + Akshat', epic:'mgrant-golive', status:'todo', milestone:true, notes:'Target go-live 1 Jul' },
-  { id:'gl2', title:'mForm production go-live',  date:'2026-07-03', owner:'Banita + Fathima', epic:'mform-golive', status:'todo', milestone:true, notes:'Temporary 3 Jul — depends on Play Store listing the app' }
+  { id:'gl2', title:'mForm production go-live',  date:'2026-07-03', owner:'Banita + Fathima', epic:'mform-golive', status:'todo', milestone:true, notes:'Temporary 3 Jul — depends on Play Store listing the app' },
+
+  /* ========== PHASE 2 — planned (M2–M4, Jul–Sep 2026) ========== */
+  { id:'p2a', title:'Configure Financial module',                       date:'2026-07-15', owner:'Akshat', epic:'fin-disb',  status:'todo', phase:2, notes:'M2' },
+  { id:'p2b', title:'Disbursement + Utilisation Certificate (UC) workflow', date:'2026-07-18', owner:'Akshat', epic:'fin-disb', status:'todo', phase:2, notes:'M2' },
+  { id:'p2c', title:'PO & Invoice management',                          date:'2026-07-22', owner:'Akshat', epic:'fin-disb',  status:'todo', phase:2, notes:'M2' },
+  { id:'p2d', title:'IA + Admin Expense tracking',                      date:'2026-07-25', owner:'Akshat', epic:'fin-disb',  status:'todo', phase:2, notes:'M2' },
+  { id:'p2e', title:'Analytics setup',                                  date:'2026-07-20', owner:'Banita', epic:'analytics', status:'todo', phase:2, notes:'M2' },
+  { id:'p2f', title:'Workflow pilot with one partner',                  date:'2026-07-28', owner:'Akshat', epic:'analytics', status:'todo', phase:2, notes:'M2' },
+  { id:'p2g', title:'CSR Annual Action Plan (AAP) module',              date:'2026-08-12', owner:'Banita', epic:'csr-aap',   status:'todo', phase:2, notes:'M3' },
+  { id:'p2h', title:'Landing pages',                                    date:'2026-08-20', owner:'Banita', epic:'csr-aap',   status:'todo', phase:2, notes:'M3' },
+  { id:'p2i', title:'Configure multi-level approval workflows',         date:'2026-08-28', owner:'Akshat', epic:'approvals', status:'todo', phase:2, notes:'M4' },
+  { id:'p2j', title:'Approval matrix per grant type',                   date:'2026-09-05', owner:'Akshat', epic:'approvals', status:'todo', phase:2, notes:'M4' },
+  { id:'p2k', title:'Notification & email templates',                   date:'2026-09-12', owner:'Banita', epic:'notifs',    status:'todo', phase:2, notes:'M4' },
+  { id:'p2l', title:'Notification trigger configuration',               date:'2026-09-18', owner:'Akshat', epic:'notifs',    status:'todo', phase:2, notes:'M4' },
+  { id:'p2m', title:'Final alignment review with Amazon',               date:'2026-09-25', owner:'Banita', epic:'alignment', status:'todo', phase:2, notes:'M4' },
+  { id:'p2n', title:'Stabilisation & troubleshooting',                  date:'2026-10-15', owner:'Banita + Akshat', epic:'alignment', status:'todo', phase:2, notes:'Q4' }
 ];

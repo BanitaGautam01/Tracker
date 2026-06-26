@@ -41,8 +41,10 @@
   <section id="view-dashboard" class="view">
     <div id="mgmtSummary"></div>
     <div id="riskRegister"></div>
-    <h3 class="section-h">Task Status by Epic</h3>
+    <h3 class="section-h">Task Status by Epic — Phase 1 (current)</h3>
     <div class="epic-grid" id="epicGrid"></div>
+    <h3 class="section-h p2-h">Phase 2 — Planned Roadmap (post go-live · M2–M4)</h3>
+    <div class="epic-grid" id="epicGrid2"></div>
   </section>
 
   <!-- ===== Today's Focus ===== -->
@@ -62,6 +64,11 @@
         <option value="">All projects</option>
         <option value="mForm">mForm</option>
         <option value="mGrant">mGrant</option>
+      </select>
+      <select id="fPhase">
+        <option value="">All phases</option>
+        <option value="1">Phase 1</option>
+        <option value="2">Phase 2</option>
       </select>
       <select id="fEpic"><option value="">All epics</option></select>
       <select id="fOwner"><option value="">All owners</option></select>
