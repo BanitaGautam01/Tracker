@@ -134,6 +134,16 @@ button{font-family:inherit;cursor:pointer}
 .day-body .ptask .pt-title{flex:1}
 .day-rest{padding:14px;color:var(--muted);font-style:italic;text-align:center}
 
+/* ===== Today's Focus ===== */
+.today-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.today-head h2{margin:0;font-size:20px}
+.today-head #todayDate{font-size:14px;font-weight:600}
+.grp{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+  margin:18px 0 8px;font-weight:800}
+.grp.grp-od{color:var(--block)}
+.today-empty{background:var(--card);border:1px dashed var(--line);border-radius:13px;
+  padding:34px;text-align:center;color:var(--muted);font-size:15px}
+
 /* ===== Week view ===== */
 .weekbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
 .weeknav{display:flex;align-items:center;gap:8px}

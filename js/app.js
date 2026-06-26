@@ -58,9 +58,9 @@
     $('#view-' + view).classList.remove('hidden');
     $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
     if (view === 'dashboard') renderDashboard();
+    if (view === 'today') renderToday();
     if (view === 'tasks') renderTasks();
     if (view === 'week') renderWeek();
-    if (view === 'plan') renderPlan();
   }
 
   /* ---------- week view (Mon–Sun calendar) ---------- */
@@ -197,37 +197,28 @@
     el.value = cur;
   }
 
-  /* ---------- day-wise plan ---------- */
-  function renderPlan() {
-    const days = [];
-    let d = new Date(SPRINT_START + 'T00:00:00');
-    const end = new Date(SPRINT_END + 'T00:00:00');
-    while (d <= end) {
-      days.push(d.toISOString().slice(0, 10));
-      d.setDate(d.getDate() + 1);
+  /* ---------- today's focus ---------- */
+  function renderToday() {
+    const today = todayISO();
+    const byStatus = (a, b) => (STATUS_ORDER[a.status] ?? 4) - (STATUS_ORDER[b.status] ?? 4);
+    const todays = tasks.filter(t => t.date === today).sort(byStatus);
+    const overdue = tasks.filter(t => t.date && t.date < today && t.status !== 'done').sort(byStatus);
+
+    $('#todayDate').textContent = isoToDate(today)
+      .toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    let html = '';
+    if (todays.length) {
+      html += `<h3 class="grp">Today · ${todays.length} task${todays.length > 1 ? 's' : ''}</h3>
+        <div class="task-list">${todays.map(taskCard).join('')}</div>`;
+    } else {
+      html += `<div class="today-empty">🎉 No tasks scheduled for today.</div>`;
     }
-    $('#planList').innerHTML = days.map(iso => {
-      const items = tasks.filter(t => t.date === iso);
-      const wknd = isWeekend(iso);
-      let body;
-      if (wknd && !items.length) {
-        body = `<div class="day-rest">Weekend — team unavailable (rest day)</div>`;
-      } else if (!items.length) {
-        body = `<div class="day-rest">No tasks</div>`;
-      } else {
-        body = `<div class="day-body">` + items.map(t =>
-          `<div class="ptask st-${t.status}" data-id="${t.id}">
-             <button class="check" data-act="toggle">${t.status === 'done' ? '✓' : ''}</button>
-             <span class="pt-title">${esc(t.title)}</span>
-             <span class="tag owner">${esc(t.owner || '')}</span>
-           </div>`).join('') + `</div>`;
-      }
-      const done = items.filter(t => t.status === 'done').length;
-      return `<div class="day ${wknd ? 'weekend' : ''}">
-        <div class="day-head"><span class="d">${fmtDate(iso)}</span><span class="dow">${dow(iso)}</span>
-          ${items.length ? `<span class="cnt">${done}/${items.length} done</span>` : ''}</div>
-        ${body}</div>`;
-    }).join('');
+    if (overdue.length) {
+      html += `<h3 class="grp grp-od">Overdue / carried over · ${overdue.length}</h3>
+        <div class="task-list">${overdue.map(taskCard).join('')}</div>`;
+    }
+    $('#todayList').innerHTML = html;
   }
 
   /* ---------- task ops ---------- */

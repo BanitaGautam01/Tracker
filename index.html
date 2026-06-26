@@ -17,9 +17,9 @@
   </div>
   <nav class="tabs">
     <button class="tab active" data-view="dashboard">Dashboard</button>
+    <button class="tab" data-view="today">Today's Focus</button>
     <button class="tab" data-view="tasks">Tasks</button>
     <button class="tab" data-view="week">Week</button>
-    <button class="tab" data-view="plan">Day-wise Plan</button>
   </nav>
   <div class="actions">
     <button id="btnNew" class="btn btn-primary">+ New Task</button>
@@ -60,6 +60,15 @@
     </div>
   </section>
 
+  <!-- ===== Today's Focus ===== -->
+  <section id="view-today" class="view hidden">
+    <div class="today-head">
+      <h2>Today's Focus</h2>
+      <span id="todayDate" class="muted"></span>
+    </div>
+    <div id="todayList"></div>
+  </section>
+
   <!-- ===== Tasks ===== -->
   <section id="view-tasks" class="view hidden">
     <div class="toolbar">
@@ -95,11 +104,6 @@
     </div>
     <div class="weekgrid" id="weekGrid"></div>
     <p class="wktip muted">Tip: click any task card to edit it. Use ‹ › to move between weeks.</p>
-  </section>
-
-  <!-- ===== Day-wise plan ===== -->
-  <section id="view-plan" class="view hidden">
-    <div id="planList" class="plan-list"></div>
   </section>
 
 </main>
