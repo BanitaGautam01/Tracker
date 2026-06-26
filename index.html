@@ -18,6 +18,7 @@
   <nav class="tabs">
     <button class="tab active" data-view="dashboard">Dashboard</button>
     <button class="tab" data-view="tasks">Tasks</button>
+    <button class="tab" data-view="week">Week</button>
     <button class="tab" data-view="plan">Day-wise Plan</button>
   </nav>
   <div class="actions">
@@ -74,6 +75,26 @@
       </select>
     </div>
     <div id="taskList" class="task-list"></div>
+  </section>
+
+  <!-- ===== Week ===== -->
+  <section id="view-week" class="view hidden">
+    <div class="weekbar">
+      <div class="weeknav">
+        <button class="wbtn" id="wkPrev" aria-label="Previous week">‹</button>
+        <span class="wkrange" id="wkRange"></span>
+        <button class="wbtn" id="wkNext" aria-label="Next week">›</button>
+        <button class="wbtn today" id="wkToday">Today</button>
+      </div>
+      <span class="wklegend">
+        <i class="lg st-todo"></i>Not Started
+        <i class="lg st-inprogress"></i>In Progress
+        <i class="lg st-done"></i>Done
+        <i class="lg st-blocked"></i>Blocked
+      </span>
+    </div>
+    <div class="weekgrid" id="weekGrid"></div>
+    <p class="wktip muted">Tip: click any task card to edit it. Use ‹ › to move between weeks.</p>
   </section>
 
   <!-- ===== Day-wise plan ===== -->

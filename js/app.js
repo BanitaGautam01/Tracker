@@ -41,6 +41,16 @@
     const n = new Date(iso + 'T00:00:00').getDay();
     return n === 0 || n === 6;
   }
+  const pad2 = n => String(n).padStart(2, '0');
+  function todayISO() { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+  function isoToDate(iso) { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); }
+  function dateToISO(dt) { return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}`; }
+  function mondayOf(iso) { const dt = isoToDate(iso); const k = (dt.getDay() + 6) % 7; dt.setDate(dt.getDate() - k); return dateToISO(dt); }
+  function addDays(iso, n) { const dt = isoToDate(iso); dt.setDate(dt.getDate() + n); return dateToISO(dt); }
+  const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const STATUS_ORDER = { blocked: 0, inprogress: 1, todo: 2, done: 3 };
+  let weekStart = null;
+  const curWeek = () => weekStart || (weekStart = mondayOf(todayISO()));
 
   /* ---------- views ---------- */
   function show(view) {
@@ -49,7 +59,39 @@
     $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
     if (view === 'dashboard') renderDashboard();
     if (view === 'tasks') renderTasks();
+    if (view === 'week') renderWeek();
     if (view === 'plan') renderPlan();
+  }
+
+  /* ---------- week view (Mon–Sun calendar) ---------- */
+  function renderWeek() {
+    const start = curWeek();
+    const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+    const a = isoToDate(start), b = isoToDate(days[6]);
+    const opt = { day: 'numeric', month: 'short' };
+    $('#wkRange').textContent =
+      a.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + b.toLocaleDateString('en-GB', opt);
+
+    const today = todayISO();
+    const byDate = {};
+    tasks.forEach(t => { if (t.date) (byDate[t.date] = byDate[t.date] || []).push(t); });
+
+    $('#weekGrid').innerHTML = days.map((iso, i) => {
+      const dt = isoToDate(iso);
+      const items = (byDate[iso] || []).slice()
+        .sort((x, y) => (STATUS_ORDER[x.status] ?? 4) - (STATUS_ORDER[y.status] ?? 4));
+      const cls = [iso === today ? 'today' : '', i >= 5 ? 'weekend' : ''].join(' ');
+      const body = items.length
+        ? items.map(t =>
+            `<div class="evt st-${t.status}" data-id="${t.id}" data-act="edit" title="${esc(t.status)} · ${esc(t.owner || '')}">
+               <div class="et">${esc(t.title)}</div>
+               <div class="eo">${esc(t.owner || '—')}${t.workstream ? ' · ' + esc(t.workstream) : ''}</div>
+             </div>`).join('')
+        : (isWeekend(iso) ? '<div class="none">Weekend — rest</div>' : '<div class="none">—</div>');
+      return `<div class="daycol ${cls}">
+        <div class="dh"><div class="dow">${DOW[i]}</div><div class="dn">${dt.getDate()}</div></div>
+        <div class="wbody">${body}</div></div>`;
+    }).join('');
   }
 
   /* ---------- dashboard ---------- */
@@ -245,6 +287,10 @@
 
   $('#search').addEventListener('input', renderTasks);
   ['#fWorkstream', '#fOwner', '#fStatus'].forEach(s => $(s).addEventListener('change', renderTasks));
+
+  $('#wkPrev').addEventListener('click', () => { weekStart = addDays(curWeek(), -7); renderWeek(); });
+  $('#wkNext').addEventListener('click', () => { weekStart = addDays(curWeek(), 7); renderWeek(); });
+  $('#wkToday').addEventListener('click', () => { weekStart = mondayOf(todayISO()); renderWeek(); });
 
   $('#btnNew').addEventListener('click', () => openModal(null));
   $('#btnCancel').addEventListener('click', closeModal);
