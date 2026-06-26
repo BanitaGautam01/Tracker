@@ -1,7 +1,7 @@
 /* Amazon iNOPs Task Tracker — vanilla JS, localStorage persistence */
 (function () {
   'use strict';
-  const KEY = 'inops_tasks_v2';   // bump = ignore old pre-epic cached data, load current plan
+  const KEY = 'inops_tasks_v3';   // bump = ignore old cached data, load current plan
   const STATUSES = {
     todo:       { label: 'Not Started', color: 'var(--todo)'  },
     inprogress: { label: 'In Progress', color: 'var(--prog)'  },

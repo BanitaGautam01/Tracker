@@ -72,9 +72,9 @@ window.INOPS_SEED = [
   { id:'t14', title:'Finish form revision; internal validation; onboarding pack', date:'2026-07-02', owner:'Fathima + Banita', epic:'form-dev', status:'todo', notes:'' },
 
   /* ---------- Application Development ---------- */
-  { id:'ad1', title:'Build data-collection app (mForm) core',  date:'', owner:'Dev + Fathima', epic:'app-dev', status:'inprogress', notes:'' },
-  { id:'ad2', title:'App–form integration & rendering',        date:'', owner:'Dev + Fathima', epic:'app-dev', status:'inprogress', notes:'' },
-  { id:'ad3', title:'App build & UAT smoke test',              date:'', owner:'Dev + Fathima', epic:'app-dev', status:'todo', notes:'' },
+  { id:'ad1', title:'Build data-collection app (mForm) core',  date:'', owner:'Dev + Fathima', epic:'app-dev', status:'done', notes:'Application ready per agreed scope' },
+  { id:'ad2', title:'App–form integration & rendering',        date:'', owner:'Dev + Fathima', epic:'app-dev', status:'done', notes:'' },
+  { id:'ad3', title:'App build & UAT smoke test',              date:'', owner:'Dev + Fathima', epic:'app-dev', status:'done', notes:'' },
   { id:'t16', title:'DEMO data-collection App to Amazon; form sign-off; surveyor training pack', date:'2026-07-03', owner:'Banita + Fathima', epic:'app-dev', status:'todo', milestone:true, notes:'🏁 ANCHOR — App Demo Ready' },
 
   /* ---------- mGrant Setup ---------- */
@@ -96,8 +96,8 @@ window.INOPS_SEED = [
     resolution:'2026-07-10', mitigation:'Banita to define legacy scope & share source files; schedule upload after mGrant demo', notes:'Scope to be expanded' },
 
   /* ---------- KPI Refinement ---------- */
-  { id:'k1', title:'Refine programme KPIs & logframe indicators', date:'', owner:'Banita', epic:'kpi', status:'todo', notes:'' },
-  { id:'k2', title:'Map KPIs to mGrant & forms',                  date:'', owner:'Banita', epic:'kpi', status:'todo', notes:'' },
+  { id:'k1', title:'Refine programme KPIs & logframe indicators', date:'2026-07-13', owner:'Banita', epic:'kpi', status:'todo', notes:'Post 10 Jul rollout' },
+  { id:'k2', title:'Map KPIs to mGrant & forms',                  date:'2026-07-13', owner:'Banita', epic:'kpi', status:'todo', notes:'Post 10 Jul rollout' },
 
   /* ---------- mGrant Training ---------- */
   { id:'t19', title:'Schedule & kick off NGO partner training on mGrant', date:'2026-07-06', owner:'Banita', epic:'mgrant-train', status:'todo', notes:'' },
@@ -106,9 +106,14 @@ window.INOPS_SEED = [
   /* ---------- App Training ---------- */
   { id:'at1', title:'Prepare app training material', date:'', owner:'Banita', epic:'app-train', status:'todo', notes:'' },
   { id:'at2', title:'Conduct surveyor / field-team app training sessions', date:'', owner:'Banita', epic:'app-train', status:'todo', notes:'' },
+  { id:'ob6', title:'Partner onboarding support, app training & query resolution', date:'2026-07-06', owner:'Banita', epic:'app-train', status:'todo', notes:'6 – 10 Jul' },
 
   /* ---------- App User Onboarding ---------- */
-  { id:'ao1', title:'Create app users for field surveyors', date:'', owner:'Banita', epic:'app-onboard', status:'todo', notes:'' },
+  { id:'ob1', title:'ICEP — user onboarding for all 3 partners (SAAD, Way for Life, Read India)', date:'2026-06-29', owner:'Banita', epic:'app-onboard', status:'todo', notes:'Rollout — agreed app flow' },
+  { id:'ob2', title:'Social Entitlement — Triple H (HHH) user onboarding',                        date:'2026-06-29', owner:'Banita', epic:'app-onboard', status:'todo', notes:'Rollout' },
+  { id:'ob3', title:'Menstrual Hygiene — user creation & onboarding initiation (Pinkishe, SHE and We)', date:'2026-06-30', owner:'Banita', epic:'app-onboard', status:'todo', notes:'30 Jun – 1 Jul' },
+  { id:'ob4', title:'Entrepreneurship — discussion with Amazon team & ADS walkthrough scheduling', date:'2026-06-30', owner:'Banita', epic:'app-onboard', status:'todo', notes:'' },
+  { id:'ob5', title:'ADS (ACCESS) application walkthrough',                                        date:'2026-07-02', owner:'Banita', epic:'app-onboard', status:'todo', notes:'2 – 3 Jul' },
   { id:'ao2', title:'Confirm app adoption for own-platform partners', date:'', owner:'Banita', epic:'app-onboard', status:'atrisk',
     risk:'HHH (TTC), Jan Sahas (Resilience Connect) & Buzz (Buzz app) use their own field apps', impact:'These partners may not adopt the data-collection app; data-integration gap',
     resolution:'2026-07-08', mitigation:'Confirm per partner: adopt app vs API/data-sync from existing platform', notes:'' },
@@ -116,7 +121,7 @@ window.INOPS_SEED = [
   /* ---------- Dashboard & Reports ---------- */
   { id:'t20', title:'Weekly Report — build & validate (mGrant)',  date:'2026-07-03', owner:'Banita', epic:'dash-reports', status:'inprogress', notes:'Milestone M1' },
   { id:'t21', title:'Monthly Report — build & validate (mGrant)', date:'2026-07-03', owner:'Banita', epic:'dash-reports', status:'inprogress', notes:'Milestone M1' },
-  { id:'dr1', title:'Build programme & CSR dashboards',           date:'', owner:'Banita', epic:'dash-reports', status:'todo', notes:'Milestone M3 (Jul–Aug)' },
+  { id:'dr1', title:'Build programme & CSR dashboards',           date:'2026-07-13', owner:'Banita', epic:'dash-reports', status:'todo', notes:'Post 10 Jul rollout' },
 
   /* ---------- Go-Live ---------- */
   { id:'t18', title:'DEMO mGrant to Amazon — incl Weekly & Monthly reports', date:'2026-07-06', owner:'Banita + Akshat', epic:'mgrant-golive', status:'todo', milestone:true, notes:'🏁 ANCHOR — mGrant Demo Ready' },
